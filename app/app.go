@@ -2,17 +2,19 @@ package app
 
 import (
 	"context"
-	_ "github.com/lib/pq"
-	"github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
 	"server-techno-flow/internal/config"
+	"server-techno-flow/internal/database/postgres"
 	"server-techno-flow/internal/handler"
 	"server-techno-flow/internal/repository"
 	"server-techno-flow/internal/server"
 	"server-techno-flow/internal/service"
 	"syscall"
 	"time"
+
+	_ "github.com/lib/pq"
+	"github.com/sirupsen/logrus"
 )
 
 func Run() {
@@ -26,7 +28,7 @@ func Run() {
 		return
 	}
 
-	ps, err := repository.NewPostgres(repository.Postgres{
+	ps, err := postgres.NewPostgres(postgres.Postgres{
 		Host:     conf.Postgres.Host,
 		Port:     conf.Postgres.Port,
 		Username: conf.Postgres.Username,
@@ -44,11 +46,15 @@ func Run() {
 	services := service.New(repos)
 	handlers := handler.New(services)
 
-	srv := new(server.Server)
+	srv := server.New(conf, handlers.Init())
 
-	if err := srv.Run(conf.Server.Port, handlers.Init()); err != nil {
-		logrus.Fatalf("error occured while running http server: %s", err.Error())
-	}
+	go func() {
+		if err := srv.Run(); err != nil {
+			logrus.Fatalf("error occured while running http server: %s", err.Error())
+		}
+	}()
+
+	logrus.Infof("server started")
 
 	// Graceful Shutdown
 	quit := make(chan os.Signal, 1)
