@@ -1,0 +1,17 @@
+server:
+  port: 8000
+  maxHeaderBytes: 1
+  readTimeout: 10s
+  writeTimeout: 10s
+
+postgres:
+  username: "postgres"
+  password: "root"
+  host: "localhost"
+  port: "5432"
+  dbname: "techno-flow"
+  sslmode: "disable"
+
+jwt:
+  accessTokenTTL: 2h
+  refreshTokenTTL: 720h #30 days
