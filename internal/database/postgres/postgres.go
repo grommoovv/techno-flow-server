@@ -1,8 +1,9 @@
-package repository
+package postgres
 
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -30,11 +31,11 @@ func NewPostgres(cfg Postgres) (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	err = db.Ping()
-
-	if err != nil {
+	if err = db.Ping(); err != nil {
 		return nil, err
 	}
+
+	logrus.Infof("Postgres connection succesfully established")
 
 	return db, nil
 }
