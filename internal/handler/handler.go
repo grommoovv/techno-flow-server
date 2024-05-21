@@ -16,6 +16,8 @@ func New(services *service.Service) *Handler {
 func (h *Handler) Init() *gin.Engine {
 	handler := gin.New()
 
+	handler.Use(gin.Recovery(), gin.Logger(), corsMiddleware)
+
 	api := handler.Group("/api/v1")
 	{
 		auth := api.Group("/auth")
