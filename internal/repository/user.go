@@ -1,7 +1,11 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
+	"server-techno-flow/internal/database/postgres"
+	"server-techno-flow/internal/domain"
+	"strings"
 )
 
 type UserRepository struct {
@@ -12,12 +16,79 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur *UserRepository) CreateUser() {}
+func (ur *UserRepository) CreateUser(user domain.User) (int, error) {
+	var id int
 
-func (ur *UserRepository) GetUser() {}
+	query := fmt.Sprintf("INSERT INTO %s (username, password) values ($1, $2) RETURNING id", postgres.UsersTable)
 
-func (ur *UserRepository) GetAllUsers() {}
+	row := ur.db.QueryRow(query, user.Username, user.Password)
+	if err := row.Scan(&id); err != nil {
+		return 0, err
+	}
 
-func (ur *UserRepository) DeleteUser() {}
+	return id, nil
+}
 
-func (ur *UserRepository) UpdateUser() {}
+func (ur *UserRepository) GetUserByUsername(username string) (domain.User, error) {
+	var user domain.User
+
+	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE username = $1", postgres.UsersTable)
+
+	err := ur.db.QueryRow(query, username).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt)
+
+	return user, err
+}
+
+func (ur *UserRepository) GetAllUsers() ([]domain.User, error) {
+	var users []domain.User
+	query := fmt.Sprintf("SELECT * FROM %s", postgres.UsersTable)
+	if err := ur.db.Select(&users, query); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
+func (ur *UserRepository) DeleteUser(id int) (int, error) {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.UsersTable)
+	if _, err := ur.db.Exec(query, id); err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (ur *UserRepository) UpdateUser(id int, userDto domain.UserUpdateDto) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
+
+	if userDto.Username != nil {
+		setValues = append(setValues, fmt.Sprintf("username=$%d", argId))
+		args = append(args, *userDto.Username)
+		argId++
+	}
+
+	if userDto.FullName != nil {
+		setValues = append(setValues, fmt.Sprintf("fullname=$%d", argId))
+		args = append(args, *userDto.FullName)
+		argId++
+	}
+
+	if userDto.Email != nil {
+		setValues = append(setValues, fmt.Sprintf("email=$%d", argId))
+		args = append(args, *userDto.Email)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", postgres.UsersTable, setQuery, argId)
+
+	args = append(args, id)
+
+	fmt.Println(query)
+	fmt.Println(args)
+
+	_, err := ur.db.Exec(query, args...)
+	return err
+}
