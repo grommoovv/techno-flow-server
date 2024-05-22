@@ -28,7 +28,7 @@ func Run() {
 		return
 	}
 
-	ps, err := postgres.NewPostgres(postgres.Postgres{
+	ps, err := postgres.New(postgres.Postgres{
 		Host:     conf.Postgres.Host,
 		Port:     conf.Postgres.Port,
 		Username: conf.Postgres.Username,
@@ -71,7 +71,11 @@ func Run() {
 		logrus.Fatalf("error occured while stopping http server: %s", err.Error())
 	}
 
+	logrus.Infof("server gracefully shutdown")
+
 	if err := ps.Close(); err != nil {
 		logrus.Fatalf("error occured while closing postgres: %s", err.Error())
 	}
+
+	logrus.Infof("postgres successfully closed")
 }
