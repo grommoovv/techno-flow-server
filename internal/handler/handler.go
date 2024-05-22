@@ -33,9 +33,9 @@ func (h *Handler) Init() *gin.Engine {
 			{
 				users.POST("/", h.CreateUser)
 				users.GET("/", h.GetAllUsers)
-				users.GET("/:id", h.GetUser)
+				users.GET("/:username", h.GetUserByUsername)
 				users.DELETE("/:id", h.DeleteUser)
-				users.PUT("/:id", h.UpdateUser)
+				users.PATCH("/:id", h.UpdateUser)
 			}
 
 			equipment := protected.Group("/equipment")
