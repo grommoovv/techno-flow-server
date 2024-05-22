@@ -2,7 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
+	"time"
 )
 
 func corsMiddleware(c *gin.Context) {
@@ -16,4 +18,9 @@ func corsMiddleware(c *gin.Context) {
 	} else {
 		c.AbortWithStatus(http.StatusOK)
 	}
+}
+
+func loggingMiddleware(c *gin.Context) {
+	log.Printf("%s: [%s] - %s ", time.Now().Format(time.RFC3339), c.Request.Method, c.Request.RequestURI)
+	c.Next()
 }
