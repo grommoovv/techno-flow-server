@@ -1,6 +1,9 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+	"server-techno-flow/internal/domain"
+)
 
 type (
 	Auth interface {
@@ -10,11 +13,11 @@ type (
 	}
 
 	User interface {
-		CreateUser()
-		GetUser()
-		GetAllUsers()
-		DeleteUser()
-		UpdateUser()
+		CreateUser(user domain.User) (int, error)
+		GetUserByUsername(username string) (domain.User, error)
+		GetAllUsers() ([]domain.User, error)
+		DeleteUser(id int) (int, error)
+		UpdateUser(id int, userDto domain.UserUpdateDto) error
 	}
 
 	Equipment interface {
