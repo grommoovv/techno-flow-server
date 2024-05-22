@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	usersTable       = "users"
-	equipmentTable   = "equipment"
-	eventsTable      = "events"
-	reportsTable     = "reports"
-	maintenanceTable = "maintenance"
+	UsersTable       = "users"
+	EquipmentTable   = "equipment"
+	EventsTable      = "events"
+	ReportsTable     = "reports"
+	MaintenanceTable = "maintenance"
 )
 
 type Postgres struct {
@@ -23,7 +23,7 @@ type Postgres struct {
 	SSLMode  string
 }
 
-func NewPostgres(cfg Postgres) (*sqlx.DB, error) {
+func New(cfg Postgres) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
 
@@ -35,7 +35,7 @@ func NewPostgres(cfg Postgres) (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	logrus.Infof("Postgres connection succesfully established")
+	logrus.Infof("postgres connection successfully established")
 
 	return db, nil
 }
