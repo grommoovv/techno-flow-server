@@ -14,15 +14,14 @@ func New(services *service.Service) *Handler {
 }
 
 func (h *Handler) Init() *gin.Engine {
-	handler := gin.New()
+	handler := gin.Default()
 
-	handler.Use(gin.Recovery(), gin.Logger(), corsMiddleware)
+	handler.Use(corsMiddleware)
 
 	api := handler.Group("/api/v1")
 	{
 		auth := api.Group("/auth")
 		{
-			auth.POST("/sign-up", h.signUp)
 			auth.POST("/sign-in", h.signIn)
 			auth.POST("/sign-out", h.signOut)
 		}
@@ -31,35 +30,35 @@ func (h *Handler) Init() *gin.Engine {
 		{
 			users := protected.Group("/users")
 			{
-				users.POST("/", h.CreateUser)
-				users.GET("/", h.GetAllUsers)
-				users.GET("/:username", h.GetUserByUsername)
+				users.POST("", h.CreateUser)
+				users.GET("", h.GetAllUsers)
+				users.GET("/:id", h.GetUserById)
 				users.DELETE("/:id", h.DeleteUser)
 				users.PATCH("/:id", h.UpdateUser)
 			}
 
 			equipment := protected.Group("/equipment")
 			{
-				equipment.POST("/", h.CreateEquipment)
-				equipment.GET("/", h.GetAllEquipment)
-				equipment.GET("/:id", h.GetEquipment)
+				equipment.POST("", h.CreateEquipment)
+				equipment.GET("", h.GetAllEquipment)
+				equipment.GET("/:id", h.GetEquipmentById)
 				equipment.DELETE("/:id", h.DeleteEquipment)
-				equipment.PUT("/:id", h.UpdateEquipment)
+				equipment.PATCH("/:id", h.UpdateEquipment)
 			}
 
 			events := protected.Group("/events")
 			{
-				events.POST("/", h.CreateEvent)
-				events.GET("/", h.GetAllEvents)
-				events.GET("/:id", h.GetEvent)
+				events.POST("", h.CreateEvent)
+				events.GET("", h.GetAllEvents)
+				events.GET("/:id", h.GetEventById)
 				events.DELETE("/:id", h.DeleteEvent)
 				events.PUT("/:id", h.UpdateEvent)
 			}
 
 			reports := protected.Group("/reports")
 			{
-				reports.POST("/", h.CreateReport)
-				reports.GET("/", h.GetAllReports)
+				reports.POST("", h.CreateReport)
+				reports.GET("", h.GetAllReports)
 				reports.GET("/:id", h.GetReport)
 				reports.DELETE("/:id", h.DeleteReport)
 				reports.PUT("/:id", h.UpdateReport)
@@ -67,8 +66,8 @@ func (h *Handler) Init() *gin.Engine {
 
 			maintenance := protected.Group("/maintenance")
 			{
-				maintenance.POST("/", h.CreateMaintenance)
-				maintenance.GET("/", h.GetAllMaintenance)
+				maintenance.POST("", h.CreateMaintenance)
+				maintenance.GET("", h.GetAllMaintenance)
 				maintenance.GET("/:id", h.GetMaintenance)
 				maintenance.DELETE("/:id", h.DeleteMaintenance)
 				maintenance.PUT("/:id", h.UpdateMaintenance)
