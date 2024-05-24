@@ -36,10 +36,10 @@ type (
 	}
 
 	Report interface {
-		CreateReport()
-		GetReport()
-		GetAllReports()
-		DeleteReport()
+		CreateReport(dto domain.ReportCreateDto) (int, error)
+		GetAllReports() ([]domain.Report, error)
+		GetReportById(id int) (domain.Report, error)
+		DeleteReport(id int) (int, error)
 		UpdateReport()
 	}
 
