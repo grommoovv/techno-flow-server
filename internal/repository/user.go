@@ -29,6 +29,15 @@ func (ur *UserRepository) CreateUser(dto domain.UserCreateDto) (int, error) {
 	return id, nil
 }
 
+func (ur *UserRepository) GetAllUsers() ([]domain.User, error) {
+	var users []domain.User
+	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.UsersTable)
+	if err := ur.db.Select(&users, query); err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (ur *UserRepository) GetUserById(id int) (domain.User, error) {
 	var user domain.User
 
@@ -37,15 +46,6 @@ func (ur *UserRepository) GetUserById(id int) (domain.User, error) {
 	err := ur.db.QueryRow(query, id).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt)
 
 	return user, err
-}
-
-func (ur *UserRepository) GetAllUsers() ([]domain.User, error) {
-	var users []domain.User
-	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.UsersTable)
-	if err := ur.db.Select(&users, query); err != nil {
-		return nil, err
-	}
-	return users, nil
 }
 
 func (ur *UserRepository) DeleteUser(id int) (int, error) {
