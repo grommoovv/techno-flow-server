@@ -17,6 +17,7 @@ func corsMiddleware(c *gin.Context) {
 		c.Next()
 	} else {
 		c.AbortWithStatus(http.StatusOK)
+		return
 	}
 }
 
