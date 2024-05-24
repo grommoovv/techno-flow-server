@@ -14,7 +14,7 @@ func NewEventService(repo repository.Event) *EventService {
 
 func (es *EventService) CreateEvent() {}
 
-func (es *EventService) GetEvent() {}
+func (es *EventService) GetEventById() {}
 
 func (es *EventService) GetAllEvents() {}
 
