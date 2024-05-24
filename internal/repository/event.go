@@ -14,7 +14,7 @@ func NewEventRepository(db *sqlx.DB) *EventRepository {
 
 func (er *EventRepository) CreateEvent() {}
 
-func (er *EventRepository) GetEvent() {}
+func (er *EventRepository) GetEventById() {}
 
 func (er *EventRepository) GetAllEvents() {}
 
