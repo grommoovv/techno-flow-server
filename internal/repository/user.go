@@ -16,12 +16,12 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur *UserRepository) CreateUser(user domain.User) (int, error) {
+func (ur *UserRepository) CreateUser(dto domain.UserCreateDto) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (username, password) values ($1, $2) RETURNING id", postgres.UsersTable)
 
-	row := ur.db.QueryRow(query, user.Username, user.Password)
+	row := ur.db.QueryRow(query, dto.Username, dto.Password)
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
@@ -29,19 +29,19 @@ func (ur *UserRepository) CreateUser(user domain.User) (int, error) {
 	return id, nil
 }
 
-func (ur *UserRepository) GetUserByUsername(username string) (domain.User, error) {
+func (ur *UserRepository) GetUserById(id int) (domain.User, error) {
 	var user domain.User
 
-	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE username = $1", postgres.UsersTable)
+	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE id = $1", postgres.UsersTable)
 
-	err := ur.db.QueryRow(query, username).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt)
+	err := ur.db.QueryRow(query, id).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt)
 
 	return user, err
 }
 
 func (ur *UserRepository) GetAllUsers() ([]domain.User, error) {
 	var users []domain.User
-	query := fmt.Sprintf("SELECT * FROM %s", postgres.UsersTable)
+	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.UsersTable)
 	if err := ur.db.Select(&users, query); err != nil {
 		return nil, err
 	}
