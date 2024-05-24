@@ -12,14 +12,14 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	var userDto domain.UserCreateDto
 
 	if err := c.BindJSON(&userDto); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	id, err := h.services.User.CreateUser(userDto)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -33,7 +33,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 
 	if err != nil {
 		fmt.Printf("Error Fetching Users: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -44,18 +44,18 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 
 func (h *Handler) GetUserById(c *gin.Context) {
 	paramId := c.Param("id")
-	fmt.Printf("DeleteUser Called, param: %s\n", paramId)
+	fmt.Printf("GetUserById Called, param: %s\n", paramId)
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	user, err := h.services.User.GetUserById(id)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -70,13 +70,13 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	_, err = h.services.User.DeleteUser(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
