@@ -4,7 +4,7 @@ import "github.com/gin-gonic/gin"
 
 func (h *Handler) CreateEvent(c *gin.Context) {}
 
-func (h *Handler) GetEvent(c *gin.Context) {}
+func (h *Handler) GetEventById(c *gin.Context) {}
 
 func (h *Handler) GetAllEvents(c *gin.Context) {}
 
