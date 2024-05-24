@@ -9,3 +9,9 @@ type Report struct {
 	UserId      int       `json:"user_id" db:"user_id"`
 	EquipmentId int       `json:"equipment_id" db:"equipment_id"`
 }
+
+type ReportCreateDto struct {
+	Message     string `json:"message"`
+	UserId      int    `json:"user_id" db:"user_id"`
+	EquipmentId int    `json:"equipment_id" db:"equipment_id"`
+}
