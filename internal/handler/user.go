@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) CreateUser(c *gin.Context) {
-	var userDto domain.User
+	var userDto domain.UserCreateDto
 
 	if err := c.BindJSON(&userDto); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{})
@@ -28,19 +28,6 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	})
 }
 
-func (h *Handler) GetUserByUsername(c *gin.Context) {
-	user, err := h.services.User.GetUserByUsername(c.Param("username"))
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
-		return
-	}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"user": user,
-	})
-}
-
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	users, err := h.services.User.GetAllUsers()
 
@@ -52,6 +39,28 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"users": users,
+	})
+}
+
+func (h *Handler) GetUserById(c *gin.Context) {
+	paramId := c.Param("id")
+	fmt.Printf("DeleteUser Called, param: %s\n", paramId)
+
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	user, err := h.services.User.GetUserById(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"user": user,
 	})
 }
 
