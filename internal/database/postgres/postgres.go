@@ -7,11 +7,12 @@ import (
 )
 
 const (
-	UsersTable       = "users"
-	EquipmentTable   = "equipment"
-	EventsTable      = "events"
-	ReportsTable     = "reports"
-	MaintenanceTable = "maintenance"
+	UsersTable          = "users"
+	EquipmentTable      = "equipment"
+	EventsTable         = "events"
+	EquipmentUsageTable = "equipment_usage"
+	ReportsTable        = "reports"
+	MaintenanceTable    = "maintenance"
 )
 
 type Postgres struct {
