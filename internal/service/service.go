@@ -7,30 +7,29 @@ import (
 
 type (
 	Auth interface {
-		SignUp()
-		SignIn()
+		SignIn(user domain.UserSignInDto) (domain.User, error)
 		SignOut()
 	}
 
 	User interface {
-		CreateUser(user domain.User) (int, error)
-		GetUserByUsername(username string) (domain.User, error)
+		CreateUser(dto domain.UserCreateDto) (int, error)
+		GetUserById(userId int) (domain.User, error)
 		GetAllUsers() ([]domain.User, error)
 		DeleteUser(id int) (int, error)
-		UpdateUser(id int, userDto domain.UserUpdateDto) error
+		UpdateUser(id int, dto domain.UserUpdateDto) error
 	}
 
 	Equipment interface {
-		CreateEquipment()
-		GetEquipment()
-		GetAllEquipment()
-		DeleteEquipment()
-		UpdateEquipment()
+		CreateEquipment(dto domain.EquipmentCreateDto) (int, error)
+		GetAllEquipment() ([]domain.Equipment, error)
+		GetEquipmentById(id int) (domain.Equipment, error)
+		DeleteEquipment(id int) (int, error)
+		UpdateEquipment(id int, dto domain.EquipmentUpdateDto) error
 	}
 
 	Event interface {
 		CreateEvent()
-		GetEvent()
+		GetEventById()
 		GetAllEvents()
 		DeleteEvent()
 		UpdateEvent()
