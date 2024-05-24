@@ -13,12 +13,12 @@ func NewUserService(repo repository.User) *UserService {
 	return &UserService{repo: repo}
 }
 
-func (us *UserService) CreateUser(user domain.User) (int, error) {
-	return us.repo.CreateUser(user)
+func (us *UserService) CreateUser(userDto domain.UserCreateDto) (int, error) {
+	return us.repo.CreateUser(userDto)
 }
 
-func (us *UserService) GetUserByUsername(username string) (domain.User, error) {
-	return us.repo.GetUserByUsername(username)
+func (us *UserService) GetUserById(id int) (domain.User, error) {
+	return us.repo.GetUserById(id)
 }
 
 func (us *UserService) GetAllUsers() ([]domain.User, error) {
