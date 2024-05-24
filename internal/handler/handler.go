@@ -59,7 +59,7 @@ func (h *Handler) Init() *gin.Engine {
 			{
 				reports.POST("", h.CreateReport)
 				reports.GET("", h.GetAllReports)
-				reports.GET("/:id", h.GetReport)
+				reports.GET("/:id", h.GetReportById)
 				reports.DELETE("/:id", h.DeleteReport)
 				reports.PUT("/:id", h.UpdateReport)
 			}
