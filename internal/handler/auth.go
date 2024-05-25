@@ -13,7 +13,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	var signInDto domain.UserSignInDto
 
 	if err := c.BindJSON(&signInDto); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error sign in dto": err.Error()})
+		ResponseError(c, "failed to bind sign-in dto", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -21,19 +21,13 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	user, err := h.services.Auth.SignIn(signInDto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error while signing in": err.Error()})
+		ResponseError(c, "failed to sign-in", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"signed in user": user,
-	})
+	ResponseSuccess(c, "signed in successfully", map[string]interface{}{"signed_in_user": user})
 }
 
 func (h *Handler) signOut(c *gin.Context) {
-	fmt.Println("signOut called")
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": "signed out",
-	})
+	ResponseError(c, "resource unavailable", "resource unavailable", http.StatusInternalServerError)
 }

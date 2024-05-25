@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"server-techno-flow/internal/domain"
@@ -12,105 +11,90 @@ func (h *Handler) CreateUser(c *gin.Context) {
 	var userDto domain.UserCreateDto
 
 	if err := c.BindJSON(&userDto); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to bind user dto", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	id, err := h.services.User.CreateUser(userDto)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to create user", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
-	})
+	ResponseSuccess(c, "user created successfully", map[string]interface{}{"user_id": id})
 }
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	users, err := h.services.User.GetAllUsers()
 
 	if err != nil {
-		fmt.Printf("Error Fetching Users: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to fetch users", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"users": users,
-	})
+	ResponseSuccess(c, "users fetched successfully", users)
 }
 
 func (h *Handler) GetUserById(c *gin.Context) {
 	paramId := c.Param("id")
-	fmt.Printf("GetUserById Called, param: %s\n", paramId)
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.services.User.GetUserById(id)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to fetch user", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"user": user,
-	})
+	ResponseSuccess(c, "user fetched successfully", user)
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
-	fmt.Printf("DeleteUser Called, param: %s\n", c.Param("id"))
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	_, err = h.services.User.DeleteUser(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to delete user", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"user_id": id,
-	})
+	ResponseSuccess(c, "user deleted successfully", map[string]interface{}{"user_id": id})
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
-	fmt.Printf("UpdateUser Called, param: %s\n", c.Param("id"))
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var userUpdateDto domain.UserUpdateDto
 
 	if err := c.BindJSON(&userUpdateDto); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to bind user dto", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	errUpdate := h.services.User.UpdateUser(id, userUpdateDto)
+	err = h.services.User.UpdateUser(id, userUpdateDto)
 
-	if errUpdate != nil {
-		fmt.Printf("Error Updating User: %v\n", errUpdate)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": errUpdate.Error()})
+	if err != nil {
+		ResponseError(c, "failed to update user", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
-	})
+	ResponseSuccess(c, "user updated successfully", map[string]interface{}{"user_id": id})
 }

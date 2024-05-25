@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"server-techno-flow/internal/domain"
@@ -12,105 +11,90 @@ func (h *Handler) CreateEquipment(c *gin.Context) {
 	var equipmentDto domain.EquipmentCreateDto
 
 	if err := c.BindJSON(&equipmentDto); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to bind equipment dto", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	id, err := h.services.Equipment.CreateEquipment(equipmentDto)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to create equipment", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
-	})
+	ResponseSuccess(c, "user created successfully", map[string]interface{}{"equipment_id": id})
 }
 
 func (h *Handler) GetAllEquipment(c *gin.Context) {
 	equipment, err := h.services.Equipment.GetAllEquipment()
 
 	if err != nil {
-		fmt.Printf("error fetching equipment: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to fetch equipment", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"equipment": equipment,
-	})
+	ResponseSuccess(c, "equipment fetched successfully", equipment)
 }
 
 func (h *Handler) GetEquipmentById(c *gin.Context) {
 	paramId := c.Param("id")
-	fmt.Printf("GetEquipmentById Called, param: %s\n", paramId)
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	equipment, err := h.services.Equipment.GetEquipmentById(id)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to fetch equipment", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"equipment": equipment,
-	})
+	ResponseSuccess(c, "user fetched successfully", equipment)
 }
 
 func (h *Handler) DeleteEquipment(c *gin.Context) {
-	fmt.Printf("DeleteEquipment Called, param: %s\n", c.Param("id"))
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	_, err = h.services.Equipment.DeleteEquipment(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to delete equipment", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"equipment_id": id,
-	})
+	ResponseSuccess(c, "equipment deleted successfully", map[string]interface{}{"equipment_id": id})
 }
 
 func (h *Handler) UpdateEquipment(c *gin.Context) {
-	fmt.Printf("UpdateEquipment Called, param: %s\n", c.Param("id"))
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var equipmentUpdateDto domain.EquipmentUpdateDto
 
 	if err := c.BindJSON(&equipmentUpdateDto); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ResponseError(c, "failed to bind equipment dto", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	errUpdate := h.services.Equipment.UpdateEquipment(id, equipmentUpdateDto)
+	err = h.services.Equipment.UpdateEquipment(id, equipmentUpdateDto)
 
-	if errUpdate != nil {
-		fmt.Printf("Error Updating User: %v\n", errUpdate)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": errUpdate.Error()})
+	if err != nil {
+		ResponseError(c, "failed to update equipment", err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"id": id,
-	})
+	ResponseSuccess(c, "user updated successfully", map[string]interface{}{"equipment_id": id})
 }
