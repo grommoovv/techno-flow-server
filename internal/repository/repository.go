@@ -28,10 +28,10 @@ type (
 	}
 
 	Event interface {
-		CreateEvent()
-		GetEventById()
-		GetAllEvents()
-		DeleteEvent()
+		CreateEvent(dto domain.EventCreateDto) (int, error)
+		GetAllEvents() ([]domain.Event, error)
+		GetEventById(id int) (domain.Event, error)
+		DeleteEvent(id int) (int, error)
 		UpdateEvent()
 	}
 
