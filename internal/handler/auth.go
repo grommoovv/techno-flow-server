@@ -25,7 +25,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	ResponseSuccess(c, "signed in successfully", map[string]interface{}{"signed_in_user": user})
+	ResponseSuccess(c, "user signed in successfully", user)
 }
 
 func (h *Handler) signOut(c *gin.Context) {
