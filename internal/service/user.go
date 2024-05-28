@@ -7,13 +7,15 @@ import (
 
 type UserService struct {
 	repo repository.User
+	TokenService
 }
 
-func NewUserService(repo repository.User) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(repo repository.User, tokenService *TokenService) *UserService {
+	return &UserService{repo: repo, TokenService: *tokenService}
 }
 
 func (us *UserService) CreateUser(userDto domain.UserCreateDto) (int, error) {
+	userDto.Password = generatePasswordHash(userDto.Password)
 	return us.repo.CreateUser(userDto)
 }
 

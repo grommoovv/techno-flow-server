@@ -15,7 +15,7 @@ func NewAuthRepository(db *sqlx.DB) *AuthRepository {
 	return &AuthRepository{db: db}
 }
 
-func (ar *AuthRepository) SignIn(userDto domain.UserSignInDto) (domain.User, error) {
+func (ar *AuthRepository) GetUserByCredentials(userDto domain.UserSignInDto) (domain.User, error) {
 	var user domain.User
 
 	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE username = $1 AND password = $2", postgres.UsersTable)

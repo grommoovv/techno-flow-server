@@ -26,9 +26,9 @@ func (h *Handler) Init() *gin.Engine {
 			auth.POST("/sign-out", h.signOut)
 		}
 
-		protected := api.Group("")
+		authenticated := api.Group("")
 		{
-			users := protected.Group("/users")
+			users := authenticated.Group("/users")
 			{
 				users.POST("", h.CreateUser)
 				users.GET("", h.GetAllUsers)
@@ -37,7 +37,7 @@ func (h *Handler) Init() *gin.Engine {
 				users.PATCH("/:id", h.UpdateUser)
 			}
 
-			equipment := protected.Group("/equipment")
+			equipment := authenticated.Group("/equipment")
 			{
 				equipment.POST("", h.CreateEquipment)
 				equipment.GET("", h.GetAllEquipment)
@@ -46,7 +46,7 @@ func (h *Handler) Init() *gin.Engine {
 				equipment.PATCH("/:id", h.UpdateEquipment)
 			}
 
-			events := protected.Group("/events")
+			events := authenticated.Group("/events")
 			{
 				events.POST("", h.CreateEvent)
 				events.GET("", h.GetAllEvents)
@@ -55,7 +55,7 @@ func (h *Handler) Init() *gin.Engine {
 				events.PUT("/:id", h.UpdateEvent)
 			}
 
-			reports := protected.Group("/reports")
+			reports := authenticated.Group("/reports")
 			{
 				reports.POST("", h.CreateReport)
 				reports.GET("", h.GetAllReports)
@@ -64,7 +64,7 @@ func (h *Handler) Init() *gin.Engine {
 				reports.PUT("/:id", h.UpdateReport)
 			}
 
-			maintenance := protected.Group("/maintenance")
+			maintenance := authenticated.Group("/maintenance")
 			{
 				maintenance.POST("", h.CreateMaintenance)
 				maintenance.GET("", h.GetAllMaintenance)

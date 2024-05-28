@@ -7,7 +7,7 @@ import (
 
 type (
 	Auth interface {
-		SignIn(dto domain.UserSignInDto) (domain.User, error)
+		GetUserByCredentials(dto domain.UserSignInDto) (domain.User, error)
 		SignOut()
 	}
 
@@ -51,6 +51,13 @@ type (
 		UpdateMaintenance()
 	}
 
+	Token interface {
+		GetTokenByUserId(userId int) (domain.Token, error)
+		SaveToken(userId int, refreshToken string) (int, error)
+		UpdateToken(userId int, refreshToken string) (int, error)
+		DeleteToken(refreshToken string) error
+	}
+
 	Repository struct {
 		User
 		Auth
@@ -58,6 +65,7 @@ type (
 		Event
 		Report
 		Maintenance
+		Token
 	}
 )
 
@@ -69,5 +77,6 @@ func New(db *sqlx.DB) *Repository {
 		Event:       NewEventRepository(db),
 		Report:      NewReportRepository(db),
 		Maintenance: NewMaintenanceRepository(db),
+		Token:       NewTokenRepository(db),
 	}
 }

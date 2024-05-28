@@ -4,7 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strings"
 	"time"
+)
+
+const (
+	authorizationHeader = "Authorization"
+	userCtx             = "userId"
 )
 
 func corsMiddleware(c *gin.Context) {
@@ -24,4 +30,32 @@ func corsMiddleware(c *gin.Context) {
 func loggingMiddleware(c *gin.Context) {
 	log.Printf("%s: [%s] - %s ", time.Now().Format(time.RFC3339), c.Request.Method, c.Request.RequestURI)
 	c.Next()
+}
+
+func (h *Handler) authMiddleware(c *gin.Context) {
+	header := c.GetHeader(authorizationHeader)
+
+	if header == "" {
+		ResponseError(c, "", "empty authorization header", http.StatusUnauthorized)
+		c.Abort()
+		return
+	}
+
+	headerParts := strings.Split(header, " ")
+
+	if len(headerParts) != 2 {
+		ResponseError(c, "invalid authorization header", "", http.StatusUnauthorized)
+		c.Abort()
+		return
+	}
+
+	userId, err := h.services.Token.ParseAccessToken(headerParts[1])
+
+	if err != nil {
+		ResponseError(c, "", err.Error(), http.StatusUnauthorized)
+		c.Abort()
+		return
+	}
+
+	c.Set(userCtx, userId)
 }
