@@ -25,7 +25,17 @@ func (tr *TokenRepository) GetTokenByUserId(userId int) (domain.Token, error) {
 	return token, err
 }
 
-func (tr *TokenRepository) SaveToken(userId int, refreshToken string) (int, error) {
+func (tr *TokenRepository) FindToken(refreshToken string) (domain.Token, error) {
+	var token domain.Token
+
+	query := fmt.Sprintf("SELECT * FROM %s WHERE refresh_token = $1", postgres.TokensTable)
+
+	err := tr.db.QueryRow(query, refreshToken).Scan(&token.Id, &token.RefreshToken, &token.UserId)
+
+	return token, err
+}
+
+func (tr *TokenRepository) SaveRefreshToken(userId int, refreshToken string) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (refresh_token, user_id) values ($1, $2) RETURNING id", postgres.TokensTable)
@@ -38,17 +48,11 @@ func (tr *TokenRepository) SaveToken(userId int, refreshToken string) (int, erro
 	return id, nil
 }
 
-func (tr *TokenRepository) UpdateToken(userId int, refreshToken string) (int, error) {
-	var id int
-
+func (tr *TokenRepository) UpdateToken(userId int, refreshToken string) error {
 	query := fmt.Sprintf("UPDATE %s SET refresh_token = $1 WHERE user_id = $2", postgres.TokensTable)
-	row := tr.db.QueryRow(query, refreshToken, userId)
-	if err := row.Scan(&id); err != nil {
-		return 0, err
-	}
+	_, err := tr.db.Exec(query, refreshToken, userId)
 
-	return id, nil
-
+	return err
 }
 
 func (tr *TokenRepository) DeleteToken(refreshToken string) error {

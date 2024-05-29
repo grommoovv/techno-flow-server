@@ -99,27 +99,34 @@ func (ts *TokenService) GetTokenByUserId(userId int) (domain.Token, error) {
 	return ts.repo.GetTokenByUserId(userId)
 }
 
-func (ts *TokenService) SaveToken(userId int, refreshToken string) (int, error) {
+func (ts *TokenService) FindToken(refreshToken string) (domain.Token, error) {
+	return ts.repo.FindToken(refreshToken)
+}
+
+func (ts *TokenService) SaveRefreshToken(userId int, refreshToken string) (int, error) {
 	_, err := ts.GetTokenByUserId(userId)
 
 	// Если есть ошибка и это не ошибка "не найдено", то вернуть ошибку
 	if err != nil && err != sql.ErrNoRows {
+		fmt.Printf("Если есть ошибка и это не ошибка \"не найдено\", то вернуть ошибку: %s", err.Error())
 		return 0, err
 	}
 
 	if err == sql.ErrNoRows {
 		// Первый раз генерируем токен
-		return ts.repo.SaveToken(userId, refreshToken)
+		fmt.Printf("Первый раз генерируем токен? ошибкa: %s", err.Error())
+		return ts.repo.SaveRefreshToken(userId, refreshToken)
 	}
 
 	// Если токен уже есть, обновляем его
-	return ts.UpdateToken(userId, refreshToken)
+	return 0, ts.UpdateRefreshToken(userId, refreshToken)
 }
 
-func (ts *TokenService) UpdateToken(userId int, refreshToken string) (int, error) {
+func (ts *TokenService) UpdateRefreshToken(userId int, refreshToken string) error {
+	fmt.Printf("UpdateToken?")
 	return ts.repo.UpdateToken(userId, refreshToken)
 }
 
-func (ts *TokenService) DeleteToken(refreshToken string) error {
+func (ts *TokenService) DeleteRefreshToken(refreshToken string) error {
 	return ts.repo.DeleteToken(refreshToken)
 }

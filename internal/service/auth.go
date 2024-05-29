@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"server-techno-flow/internal/domain"
@@ -23,48 +24,99 @@ type tokenClaims struct {
 type AuthService struct {
 	repo repository.Auth
 	TokenService
+	UserService
 }
 
-func NewAuthService(repo repository.Auth, tokenService *TokenService) *AuthService {
-	return &AuthService{repo: repo, TokenService: *tokenService}
+func NewAuthService(repo repository.Auth, tokenService *TokenService, userService *UserService) *AuthService {
+	return &AuthService{repo: repo, TokenService: *tokenService, UserService: *userService}
 }
 
 func (as *AuthService) SignIn(credentials domain.UserSignInDto) (domain.User, string, string, error) {
-	var nullUser domain.User
-
 	credentials.Password = generatePasswordHash(credentials.Password)
 	user, err := as.repo.GetUserByCredentials(credentials)
 
 	if err != nil {
 		fmt.Printf("error getting user by credentials: %s\n", err.Error())
-		return nullUser, "", "", err
+		return domain.User{}, "", "", err
 	}
 
 	refreshToken, err := as.NewRefreshToken(user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation refresh token: %s\n", err.Error())
-		return nullUser, "", "", err
+		return domain.User{}, "", "", err
 	}
 
-	_, err = as.SaveToken(user.Id, refreshToken)
+	_, err = as.SaveRefreshToken(user.Id, refreshToken)
 
 	if err != nil {
 		fmt.Printf("error saving token: %s\n", err.Error())
-		return nullUser, "", "", err
+		return domain.User{}, "", "", err
 	}
 
 	accessToken, err := as.NewAccessToken(user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation access token: %s\n", err.Error())
-		return nullUser, "", "", err
+		return domain.User{}, "", "", err
 	}
 
 	return user, refreshToken, accessToken, nil
 }
 
-func (as *AuthService) SignOut() {}
+func (as *AuthService) SignOut(refreshToken string) error {
+	return as.DeleteRefreshToken(refreshToken)
+}
+
+func (as *AuthService) Refresh(refreshToken string) (domain.User, string, string, error) {
+	if refreshToken == "" {
+		return domain.User{}, "", "", errors.New("unauthorized")
+	}
+
+	userId, err := as.ParseRefreshToken(refreshToken)
+
+	if err != nil {
+		fmt.Printf("error parsing refresh token: %s\n", err.Error())
+		return domain.User{}, "", "", errors.New("unauthorized")
+	}
+
+	_, err = as.FindToken(refreshToken)
+
+	if err != nil {
+		fmt.Printf("error finding token: %s\n", err.Error())
+		return domain.User{}, "", "", errors.New("unauthorized")
+	}
+
+	user, err := as.GetUserById(userId)
+
+	if err != nil {
+		fmt.Printf("error getting user: %s\n", err.Error())
+		return domain.User{}, "", "", errors.New("unauthorized")
+	}
+
+	newRefreshToken, err := as.NewRefreshToken(user.Id, user.Username)
+
+	if err != nil {
+		fmt.Printf("error generation refresh token: %s\n", err.Error())
+		return domain.User{}, "", "", err
+	}
+
+	_, err = as.SaveRefreshToken(user.Id, newRefreshToken)
+
+	if err != nil {
+		fmt.Printf("error saving token: %s\n", err.Error())
+		return domain.User{}, "", "", err
+	}
+
+	newAccessToken, err := as.NewAccessToken(user.Id, user.Username)
+
+	if err != nil {
+		fmt.Printf("error generation access token: %s\n", err.Error())
+		return domain.User{}, "", "", err
+	}
+
+	return user, newRefreshToken, newAccessToken, nil
+}
 
 func generatePasswordHash(password string) string {
 	hash := sha1.New()

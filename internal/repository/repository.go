@@ -53,8 +53,9 @@ type (
 
 	Token interface {
 		GetTokenByUserId(userId int) (domain.Token, error)
-		SaveToken(userId int, refreshToken string) (int, error)
-		UpdateToken(userId int, refreshToken string) (int, error)
+		FindToken(refreshToken string) (domain.Token, error)
+		SaveRefreshToken(userId int, refreshToken string) (int, error)
+		UpdateToken(userId int, refreshToken string) error
 		DeleteToken(refreshToken string) error
 	}
 

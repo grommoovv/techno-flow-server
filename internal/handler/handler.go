@@ -24,6 +24,7 @@ func (h *Handler) Init() *gin.Engine {
 		{
 			auth.POST("/sign-in", h.signIn)
 			auth.POST("/sign-out", h.signOut)
+			auth.GET("/refresh", h.refresh)
 		}
 
 		authenticated := api.Group("")

@@ -8,7 +8,8 @@ import (
 type (
 	Auth interface {
 		SignIn(user domain.UserSignInDto) (domain.User, string, string, error)
-		SignOut()
+		SignOut(refreshToken string) error
+		Refresh(refreshToken string) (domain.User, string, string, error)
 	}
 
 	User interface {
@@ -57,9 +58,10 @@ type (
 		ParseRefreshToken(accessToken string) (int, error)
 		ParseAccessToken(accessToken string) (int, error)
 		GetTokenByUserId(userId int) (domain.Token, error)
-		SaveToken(userId int, refreshToken string) (int, error)
-		UpdateToken(userId int, refreshToken string) (int, error)
-		DeleteToken(refreshToken string) error
+		FindToken(refreshToken string) (domain.Token, error)
+		SaveRefreshToken(userId int, refreshToken string) (int, error)
+		UpdateRefreshToken(userId int, refreshToken string) error
+		DeleteRefreshToken(refreshToken string) error
 	}
 
 	Service struct {
@@ -75,9 +77,10 @@ type (
 
 func New(repos *repository.Repository) *Service {
 	tokenService := NewTokenService(repos.Token)
+	userService := NewUserService(repos.User, tokenService)
 	return &Service{
-		Auth:        NewAuthService(repos.Auth, tokenService),
-		User:        NewUserService(repos.User, tokenService),
+		Auth:        NewAuthService(repos.Auth, tokenService, userService),
+		User:        userService,
 		Equipment:   NewEquipmentService(repos.Equipment),
 		Event:       NewEventService(repos.Event),
 		Report:      NewReportService(repos.Report),
