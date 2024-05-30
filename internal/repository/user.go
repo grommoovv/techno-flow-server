@@ -48,6 +48,16 @@ func (ur *UserRepository) GetById(id int) (domain.User, error) {
 	return user, err
 }
 
+func (ur *UserRepository) GetByCredentials(userDto domain.UserSignInDto) (domain.User, error) {
+	var user domain.User
+
+	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE username = $1 AND password = $2", postgres.UsersTable)
+
+	err := ur.db.QueryRow(query, userDto.Username, userDto.Password).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt)
+
+	return user, err
+}
+
 func (ur *UserRepository) Delete(id int) (int, error) {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.UsersTable)
 	if _, err := ur.db.Exec(query, id); err != nil {

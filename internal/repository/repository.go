@@ -7,13 +7,15 @@ import (
 
 type (
 	Auth interface {
-		GetUserByCredentials(dto domain.UserSignInDto) (domain.User, error)
+		SignIn()
 		SignOut()
 	}
 
 	User interface {
 		GetAll() ([]domain.User, error)
 		GetById(id int) (domain.User, error)
+		GetByCredentials(dto domain.UserSignInDto) (domain.User, error)
+
 		Create(dto domain.UserCreateDto) (int, error)
 		Delete(id int) (int, error)
 		Update(id int, dto domain.UserUpdateDto) error

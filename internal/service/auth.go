@@ -22,39 +22,39 @@ type tokenClaims struct {
 }
 
 type AuthService struct {
-	repo repository.Auth
-	TokenService
-	UserService
+	repo         repository.Auth
+	tokenService TokenService
+	userService  UserService
 }
 
 func NewAuthService(repo repository.Auth, tokenService *TokenService, userService *UserService) *AuthService {
-	return &AuthService{repo: repo, TokenService: *tokenService, UserService: *userService}
+	return &AuthService{repo: repo, tokenService: *tokenService, userService: *userService}
 }
 
 func (as *AuthService) SignIn(credentials domain.UserSignInDto) (domain.User, string, string, error) {
 	credentials.Password = generatePasswordHash(credentials.Password)
-	user, err := as.repo.GetUserByCredentials(credentials)
+	user, err := as.userService.GetUserByCredentials(credentials)
 
 	if err != nil {
 		fmt.Printf("error getting user by credentials: %s\n", err.Error())
 		return domain.User{}, "", "", err
 	}
 
-	refreshToken, err := as.NewRefreshToken(user.Id, user.Username)
+	refreshToken, err := as.tokenService.NewRefreshToken(user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation refresh token: %s\n", err.Error())
 		return domain.User{}, "", "", err
 	}
 
-	_, err = as.SaveRefreshToken(user.Id, refreshToken)
+	_, err = as.tokenService.SaveRefreshToken(user.Id, refreshToken)
 
 	if err != nil {
 		fmt.Printf("error saving token: %s\n", err.Error())
 		return domain.User{}, "", "", err
 	}
 
-	accessToken, err := as.NewAccessToken(user.Id, user.Username)
+	accessToken, err := as.tokenService.NewAccessToken(user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation access token: %s\n", err.Error())
@@ -65,7 +65,7 @@ func (as *AuthService) SignIn(credentials domain.UserSignInDto) (domain.User, st
 }
 
 func (as *AuthService) SignOut(refreshToken string) error {
-	return as.DeleteRefreshToken(refreshToken)
+	return as.tokenService.DeleteRefreshToken(refreshToken)
 }
 
 func (as *AuthService) Refresh(refreshToken string) (domain.User, string, string, error) {
@@ -73,42 +73,42 @@ func (as *AuthService) Refresh(refreshToken string) (domain.User, string, string
 		return domain.User{}, "", "", errors.New("unauthorized")
 	}
 
-	userId, err := as.ParseRefreshToken(refreshToken)
+	userId, err := as.tokenService.ParseRefreshToken(refreshToken)
 
 	if err != nil {
 		fmt.Printf("error parsing refresh token: %s\n", err.Error())
 		return domain.User{}, "", "", errors.New("unauthorized")
 	}
 
-	_, err = as.FindRefreshToken(refreshToken)
+	_, err = as.tokenService.FindRefreshToken(refreshToken)
 
 	if err != nil {
 		fmt.Printf("error finding token: %s\n", err.Error())
 		return domain.User{}, "", "", errors.New("unauthorized")
 	}
 
-	user, err := as.GetUserById(userId)
+	user, err := as.userService.GetUserById(userId)
 
 	if err != nil {
 		fmt.Printf("error getting user: %s\n", err.Error())
 		return domain.User{}, "", "", errors.New("unauthorized")
 	}
 
-	newRefreshToken, err := as.NewRefreshToken(user.Id, user.Username)
+	newRefreshToken, err := as.tokenService.NewRefreshToken(user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation refresh token: %s\n", err.Error())
 		return domain.User{}, "", "", err
 	}
 
-	_, err = as.SaveRefreshToken(user.Id, newRefreshToken)
+	_, err = as.tokenService.SaveRefreshToken(user.Id, newRefreshToken)
 
 	if err != nil {
 		fmt.Printf("error saving token: %s\n", err.Error())
 		return domain.User{}, "", "", err
 	}
 
-	newAccessToken, err := as.NewAccessToken(user.Id, user.Username)
+	newAccessToken, err := as.tokenService.NewAccessToken(user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation access token: %s\n", err.Error())

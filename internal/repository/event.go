@@ -18,17 +18,31 @@ func NewEventRepository(db *sqlx.DB) *EventRepository {
 func (er *EventRepository) Create(dto domain.EventCreateDto) (int, error) {
 	var eventID int
 
+	for _, equipmentID := range dto.EquipmentIDs {
+		var count int
+
+		query := fmt.Sprintf("SELECT COUNT(*) FROM equipment_usage WHERE equipment_id = $1 AND (start_date <= $2 AND end_date >= $2 OR start_date <= $3 AND end_date >= $3 OR start_date >= $2 AND end_date <= $3)")
+
+		if err := er.db.QueryRow(query, equipmentID, dto.StartDate, dto.EndDate).Scan(&count); err != nil {
+			return 0, err
+		}
+
+		if count != 0 {
+			return 0, fmt.Errorf("equipment with ID %d is already in use at this time", equipmentID)
+		}
+	}
+
 	query := fmt.Sprintf("INSERT INTO %s (title, type, start_date, end_date, user_id) values ($1, $2, $3, $4, $5) RETURNING id", postgres.EventsTable)
 	row := er.db.QueryRow(query, dto.Title, dto.Type, dto.StartDate, dto.EndDate, dto.UserID)
 	if err := row.Scan(&eventID); err != nil {
 		return 0, err
 	}
 
-	fmt.Printf("EquipmentId value: %v, type: %T\n", dto.EquipmentIDs, dto.EquipmentIDs)
+	fmt.Printf("equipmentId value: %v, type: %T\n", dto.EquipmentIDs, dto.EquipmentIDs)
 
 	for _, equipmentID := range dto.EquipmentIDs {
-		query := fmt.Sprintf("INSERT INTO %s (user_id, event_id, equipment_id) values ($1, $2, $3)", postgres.EquipmentUsageTable)
-		_, err := er.db.Exec(query, dto.UserID, eventID, equipmentID)
+		query := fmt.Sprintf("INSERT INTO %s (user_id, event_id, equipment_id, start_date, end_date) values ($1, $2, $3, $4, $5)", postgres.EquipmentUsageTable)
+		_, err := er.db.Exec(query, dto.UserID, eventID, equipmentID, dto.StartDate, dto.EndDate)
 		if err != nil {
 			return 0, err
 		}

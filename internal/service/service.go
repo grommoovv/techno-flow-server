@@ -15,6 +15,7 @@ type (
 	User interface {
 		CreateUser(dto domain.UserCreateDto) (int, error)
 		GetUserById(userId int) (domain.User, error)
+		GetUserByCredentials(dto domain.UserSignInDto) (domain.User, error)
 		GetAllUsers() ([]domain.User, error)
 		DeleteUser(id int) (int, error)
 		UpdateUser(id int, dto domain.UserUpdateDto) error
