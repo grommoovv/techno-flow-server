@@ -36,6 +36,7 @@ type (
 		CreateEvent(dto domain.EventCreateDto) (int, error)
 		GetAllEvents() ([]domain.Event, error)
 		GetEventById(id int) (domain.Event, error)
+		GetEventsByUserId(id int) ([]domain.Event, error)
 		DeleteEvent(id int) (int, error)
 		UpdateEvent()
 	}
@@ -89,7 +90,7 @@ func New(repos *repository.Repository) *Service {
 		User:        userService,
 		Equipment:   equipmentService,
 		Event:       NewEventService(repos.Event, equipmentService),
-		Report:      NewReportService(repos.Report),
+		Report:      NewReportService(repos.Report, equipmentService),
 		Maintenance: NewMaintenanceService(repos.Maintenance),
 		Token:       tokenService,
 	}

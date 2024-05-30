@@ -37,6 +37,10 @@ func (es *EventService) GetEventById(id int) (domain.Event, error) {
 	return es.repo.GetById(id)
 }
 
+func (es *EventService) GetEventsByUserId(id int) ([]domain.Event, error) {
+	return es.repo.GetByUserId(id)
+}
+
 func (es *EventService) DeleteEvent(id int) (int, error) {
 	//var updateEquipmentDto domain.EquipmentUpdateDto
 	//updateEquipmentDto.ReservedAt = &dto.StartDate

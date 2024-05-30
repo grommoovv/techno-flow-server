@@ -53,6 +53,7 @@ func (h *Handler) Init() *gin.Engine {
 				events.POST("", h.CreateEvent)
 				events.GET("", h.GetAllEvents)
 				events.GET("/:id", h.GetEventById)
+				events.GET("/user/:id", h.GetEventsByUserId)
 				events.DELETE("/:id", h.DeleteEvent)
 				events.PUT("/:id", h.UpdateEvent)
 			}

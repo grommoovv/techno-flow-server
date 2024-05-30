@@ -32,7 +32,7 @@ func (er *EquipmentRepository) Create(dto domain.EquipmentCreateDto) (int, error
 func (er *EquipmentRepository) GetAll() ([]domain.Equipment, error) {
 	var equipment []domain.Equipment
 
-	query := fmt.Sprintf("SELECT e.id, e.title, e.status, e.created_at, CASE WHEN eu.equipment_id IS NULL THEN true ELSE false END AS is_available FROM %s e LEFT JOIN %s eu ON e.id = eu.equipment_id AND current_date BETWEEN eu.start_date AND eu.end_date ORDER BY e.id ASC ", postgres.EquipmentTable, postgres.EquipmentUsageTable)
+	query := fmt.Sprintf("SELECT e.id, e.title, e.status, e.created_at, CASE WHEN eu.equipment_id IS NULL AND r.equipment_id IS NULL THEN true ELSE false END AS is_available FROM %s e LEFT JOIN %s eu ON e.id = eu.equipment_id AND current_date BETWEEN eu.start_date AND eu.end_date LEFT JOIN %s r ON e.id = r.equipment_id ORDER BY e.id ASC", postgres.EquipmentTable, postgres.EquipmentUsageTable, postgres.ReportsTable)
 	if err := er.db.Select(&equipment, query); err != nil {
 		return nil, err
 	}
@@ -54,9 +54,9 @@ func (er *EquipmentRepository) GetAvailable() ([]domain.Equipment, error) {
 func (er *EquipmentRepository) GetById(id int) (domain.Equipment, error) {
 	var equipment domain.Equipment
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", postgres.EquipmentTable)
+	query := fmt.Sprintf("SELECT e.id, e.title, e.status, e.created_at,  CASE WHEN eu.equipment_id IS NULL AND r.equipment_id IS NULL THEN true ELSE false END AS is_available FROM %s e LEFT JOIN %s eu ON e.id = eu.equipment_id AND CURRENT_DATE BETWEEN eu.start_date AND eu.end_date LEFT JOIN %s r ON e.id = r.equipment_id WHERE e.id = $1", postgres.EquipmentTable, postgres.EquipmentUsageTable, postgres.ReportsTable)
 
-	err := er.db.QueryRow(query, id).Scan(&equipment.Id, &equipment.Title, &equipment.Status, &equipment.CreatedAt)
+	err := er.db.QueryRow(query, id).Scan(&equipment.Id, &equipment.Title, &equipment.Status, &equipment.CreatedAt, &equipment.IsAvailable)
 
 	return equipment, err
 }

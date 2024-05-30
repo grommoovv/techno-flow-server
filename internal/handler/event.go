@@ -55,6 +55,25 @@ func (h *Handler) GetEventById(c *gin.Context) {
 	ResponseSuccess(c, "event fetched successfully", event)
 }
 
+func (h *Handler) GetEventsByUserId(c *gin.Context) {
+	paramId := c.Param("id")
+
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	events, err := h.services.Event.GetEventsByUserId(id)
+
+	if err != nil {
+		ResponseError(c, "failed to fetch events", err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ResponseSuccess(c, "events fetched successfully", events)
+}
+
 func (h *Handler) DeleteEvent(c *gin.Context) {
 	paramId := c.Param("id")
 

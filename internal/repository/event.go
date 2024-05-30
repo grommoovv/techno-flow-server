@@ -53,7 +53,7 @@ func (er *EventRepository) Create(dto domain.EventCreateDto) (int, error) {
 
 func (er *EventRepository) GetAll() ([]domain.Event, error) {
 	var events []domain.Event
-	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.EventsTable)
+	query := fmt.Sprintf("SELECT e.id, e.title, e.type, e.start_date, e.end_date,  e.duration, e.status, e.user_id, u.username FROM %s e JOIN %s u on e.user_id = u.id ORDER BY e.id ASC", postgres.EventsTable, postgres.UsersTable)
 	if err := er.db.Select(&events, query); err != nil {
 		return nil, err
 	}
@@ -68,6 +68,18 @@ func (er *EventRepository) GetById(id int) (domain.Event, error) {
 	err := er.db.QueryRow(query, id).Scan(&event.ID, &event.Title, &event.Type, &event.StartDate, &event.EndDate, &event.Duration, &event.Status, &event.UserID)
 
 	return event, err
+}
+
+func (er *EventRepository) GetByUserId(id int) ([]domain.Event, error) {
+	var events []domain.Event
+
+	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postgres.EventsTable)
+
+	if err := er.db.Select(&events, query, id); err != nil {
+		return nil, err
+	}
+
+	return events, nil
 }
 
 func (er *EventRepository) Delete(id int) (int, error) {

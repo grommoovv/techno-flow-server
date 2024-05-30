@@ -11,6 +11,7 @@ type Event struct {
 	Duration  []uint8   `json:"duration"`
 	Status    string    `json:"status"`
 	UserID    int       `json:"user_id" db:"user_id"`
+	Username  *string   `json:"username" db:"username"`
 }
 
 type EventCreateDto struct {

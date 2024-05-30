@@ -35,6 +35,7 @@ type (
 	Event interface {
 		GetAll() ([]domain.Event, error)
 		GetById(id int) (domain.Event, error)
+		GetByUserId(id int) ([]domain.Event, error)
 		Create(dto domain.EventCreateDto) (int, error)
 		Delete(id int) (int, error)
 		Update()
