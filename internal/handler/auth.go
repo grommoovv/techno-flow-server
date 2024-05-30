@@ -76,13 +76,13 @@ func (h *Handler) signOut(c *gin.Context) {
 func (h *Handler) refresh(c *gin.Context) {
 	token, err := c.Cookie("refresh_token")
 	if err != nil {
-		ResponseError(c, "refresh token not provided", err.Error(), http.StatusBadRequest)
+		ResponseError(c, "refresh token not provided", err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	user, refreshToken, accessToken, err := h.services.Auth.Refresh(token)
 	if err != nil {
-		ResponseError(c, "failed to sign-in", err.Error(), http.StatusInternalServerError)
+		ResponseError(c, "failed to sign-in", err.Error(), http.StatusUnauthorized)
 		return
 	}
 

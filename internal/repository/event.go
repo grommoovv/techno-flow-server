@@ -15,37 +15,29 @@ func NewEventRepository(db *sqlx.DB) *EventRepository {
 	return &EventRepository{db: db}
 }
 
-func (er *EventRepository) CreateEvent(dto domain.EventCreateDto) (int, error) {
-	var eventId int
+func (er *EventRepository) Create(dto domain.EventCreateDto) (int, error) {
+	var eventID int
 
 	query := fmt.Sprintf("INSERT INTO %s (title, type, start_date, end_date, user_id) values ($1, $2, $3, $4, $5) RETURNING id", postgres.EventsTable)
-	row := er.db.QueryRow(query, dto.Title, dto.Type, dto.StartDate, dto.EndDate, dto.UserId)
-	if err := row.Scan(&eventId); err != nil {
+	row := er.db.QueryRow(query, dto.Title, dto.Type, dto.StartDate, dto.EndDate, dto.UserID)
+	if err := row.Scan(&eventID); err != nil {
 		return 0, err
 	}
 
-	fmt.Printf("EquipmentId value: %v, type: %T\n", dto.EquipmentId, dto.EquipmentId)
+	fmt.Printf("EquipmentId value: %v, type: %T\n", dto.EquipmentIDs, dto.EquipmentIDs)
 
-	if equipmentID, ok := dto.EquipmentId.(float64); ok {
+	for _, equipmentID := range dto.EquipmentIDs {
 		query := fmt.Sprintf("INSERT INTO %s (user_id, event_id, equipment_id) values ($1, $2, $3)", postgres.EquipmentUsageTable)
-		_, err := er.db.Exec(query, dto.UserId, eventId, equipmentID)
+		_, err := er.db.Exec(query, dto.UserID, eventID, equipmentID)
 		if err != nil {
 			return 0, err
 		}
-	} else if equipmentIDs, ok := dto.EquipmentId.([]interface{}); ok {
-		for _, eqID := range equipmentIDs {
-			query := fmt.Sprintf("INSERT INTO %s (user_id, event_id, equipment_id) values ($1, $2, $3)", postgres.EquipmentUsageTable)
-			_, err := er.db.Exec(query, dto.UserId, eventId, eqID)
-			if err != nil {
-				return 0, err
-			}
-		}
 	}
 
-	return eventId, nil
+	return eventID, nil
 }
 
-func (er *EventRepository) GetAllEvents() ([]domain.Event, error) {
+func (er *EventRepository) GetAll() ([]domain.Event, error) {
 	var events []domain.Event
 	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.EventsTable)
 	if err := er.db.Select(&events, query); err != nil {
@@ -54,18 +46,44 @@ func (er *EventRepository) GetAllEvents() ([]domain.Event, error) {
 	return events, nil
 }
 
-func (er *EventRepository) GetEventById(id int) (domain.Event, error) {
+func (er *EventRepository) GetById(id int) (domain.Event, error) {
 	var event domain.Event
 
 	query := fmt.Sprintf("SELECT id, title, type, start_date, end_date, duration, status, user_id FROM %s WHERE id = $1", postgres.EventsTable)
 
-	err := er.db.QueryRow(query, id).Scan(&event.Id, &event.Title, &event.Type, &event.StartDate, &event.EndDate, &event.Duration, &event.Status, &event.UserId)
+	err := er.db.QueryRow(query, id).Scan(&event.ID, &event.Title, &event.Type, &event.StartDate, &event.EndDate, &event.Duration, &event.Status, &event.UserID)
 
 	return event, err
 }
 
-func (er *EventRepository) DeleteEvent(id int) (int, error) {
-	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.EventsTable)
+func (er *EventRepository) Delete(id int) (int, error) {
+
+	query := fmt.Sprintf("SELECT equipment_id FROM %s WHERE event_id=$1", postgres.EquipmentUsageTable)
+	rows, err := er.db.Query(query, id)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var equipmentID int
+		err := rows.Scan(&equipmentID)
+		if err != nil {
+			return 0, err
+		}
+
+		query = fmt.Sprintf("UPDATE %s SET reserved_at=NULL WHERE id=$1", postgres.EquipmentTable)
+		if _, err := er.db.Exec(query, equipmentID); err != nil {
+			return 0, err
+		}
+	}
+
+	query = fmt.Sprintf("DELETE FROM %s WHERE event_id=$1", postgres.EquipmentUsageTable)
+	if _, err := er.db.Exec(query, id); err != nil {
+		return 0, err
+	}
+
+	query = fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.EventsTable)
 	if _, err := er.db.Exec(query, id); err != nil {
 		return 0, err
 	}
@@ -73,4 +91,4 @@ func (er *EventRepository) DeleteEvent(id int) (int, error) {
 	return id, nil
 }
 
-func (er *EventRepository) UpdateEvent() {}
+func (er *EventRepository) Update() {}

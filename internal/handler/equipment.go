@@ -52,7 +52,26 @@ func (h *Handler) GetEquipmentById(c *gin.Context) {
 		return
 	}
 
-	ResponseSuccess(c, "user fetched successfully", equipment)
+	ResponseSuccess(c, "equipment fetched successfully", equipment)
+}
+
+func (h *Handler) GetEquipmentReservationDatesById(c *gin.Context) {
+	paramId := c.Param("id")
+
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	history, err := h.services.Equipment.GetEquipmentUsageHistoryById(id)
+
+	if err != nil {
+		ResponseError(c, "failed to fetch equipment reservation dates", err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ResponseSuccess(c, "equipment usage history fetched successfully", history)
 }
 
 func (h *Handler) DeleteEquipment(c *gin.Context) {

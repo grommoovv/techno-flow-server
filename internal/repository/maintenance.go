@@ -12,12 +12,12 @@ func NewMaintenanceRepository(db *sqlx.DB) *MaintenanceRepository {
 	return &MaintenanceRepository{db: db}
 }
 
-func (mr *MaintenanceRepository) CreateMaintenance() {}
+func (mr *MaintenanceRepository) Create() {}
 
-func (mr *MaintenanceRepository) GetMaintenance() {}
+func (mr *MaintenanceRepository) GetById() {}
 
-func (mr *MaintenanceRepository) GetAllMaintenance() {}
+func (mr *MaintenanceRepository) GetAll() {}
 
-func (mr *MaintenanceRepository) DeleteMaintenance() {}
+func (mr *MaintenanceRepository) Delete() {}
 
-func (mr *MaintenanceRepository) UpdateMaintenance() {}
+func (mr *MaintenanceRepository) Update() {}

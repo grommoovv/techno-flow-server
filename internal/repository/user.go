@@ -16,7 +16,7 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur *UserRepository) CreateUser(dto domain.UserCreateDto) (int, error) {
+func (ur *UserRepository) Create(dto domain.UserCreateDto) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (username, password) values ($1, $2) RETURNING id", postgres.UsersTable)
@@ -29,7 +29,7 @@ func (ur *UserRepository) CreateUser(dto domain.UserCreateDto) (int, error) {
 	return id, nil
 }
 
-func (ur *UserRepository) GetAllUsers() ([]domain.User, error) {
+func (ur *UserRepository) GetAll() ([]domain.User, error) {
 	var users []domain.User
 	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.UsersTable)
 	if err := ur.db.Select(&users, query); err != nil {
@@ -38,7 +38,7 @@ func (ur *UserRepository) GetAllUsers() ([]domain.User, error) {
 	return users, nil
 }
 
-func (ur *UserRepository) GetUserById(id int) (domain.User, error) {
+func (ur *UserRepository) GetById(id int) (domain.User, error) {
 	var user domain.User
 
 	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE id = $1", postgres.UsersTable)
@@ -48,7 +48,7 @@ func (ur *UserRepository) GetUserById(id int) (domain.User, error) {
 	return user, err
 }
 
-func (ur *UserRepository) DeleteUser(id int) (int, error) {
+func (ur *UserRepository) Delete(id int) (int, error) {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.UsersTable)
 	if _, err := ur.db.Exec(query, id); err != nil {
 		return 0, err
@@ -57,7 +57,7 @@ func (ur *UserRepository) DeleteUser(id int) (int, error) {
 	return id, nil
 }
 
-func (ur *UserRepository) UpdateUser(id int, userDto domain.UserUpdateDto) error {
+func (ur *UserRepository) Update(id int, userDto domain.UserUpdateDto) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1

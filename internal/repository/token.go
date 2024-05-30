@@ -25,7 +25,7 @@ func (tr *TokenRepository) GetTokenByUserId(userId int) (domain.Token, error) {
 	return token, err
 }
 
-func (tr *TokenRepository) FindToken(refreshToken string) (domain.Token, error) {
+func (tr *TokenRepository) FindRefreshToken(refreshToken string) (domain.Token, error) {
 	var token domain.Token
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE refresh_token = $1", postgres.TokensTable)

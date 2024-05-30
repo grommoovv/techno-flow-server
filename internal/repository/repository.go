@@ -12,27 +12,30 @@ type (
 	}
 
 	User interface {
-		CreateUser(dto domain.UserCreateDto) (int, error)
-		GetAllUsers() ([]domain.User, error)
-		GetUserById(id int) (domain.User, error)
-		DeleteUser(id int) (int, error)
-		UpdateUser(id int, dto domain.UserUpdateDto) error
+		GetAll() ([]domain.User, error)
+		GetById(id int) (domain.User, error)
+		Create(dto domain.UserCreateDto) (int, error)
+		Delete(id int) (int, error)
+		Update(id int, dto domain.UserUpdateDto) error
 	}
 
 	Equipment interface {
-		CreateEquipment(dto domain.EquipmentCreateDto) (int, error)
-		GetAllEquipment() ([]domain.Equipment, error)
-		GetEquipmentById(id int) (domain.Equipment, error)
-		DeleteEquipment(id int) (int, error)
-		UpdateEquipment(id int, dto domain.EquipmentUpdateDto) error
+		GetAll() ([]domain.Equipment, error)
+		GetAvailable() ([]domain.Equipment, error)
+		GetById(id int) (domain.Equipment, error)
+		GetUsageHistoryById(id int) ([]domain.EquipmentUsageHistory, error)
+
+		Create(dto domain.EquipmentCreateDto) (int, error)
+		Delete(id int) (int, error)
+		Update(id int, dto domain.EquipmentUpdateDto) error
 	}
 
 	Event interface {
-		CreateEvent(dto domain.EventCreateDto) (int, error)
-		GetAllEvents() ([]domain.Event, error)
-		GetEventById(id int) (domain.Event, error)
-		DeleteEvent(id int) (int, error)
-		UpdateEvent()
+		GetAll() ([]domain.Event, error)
+		GetById(id int) (domain.Event, error)
+		Create(dto domain.EventCreateDto) (int, error)
+		Delete(id int) (int, error)
+		Update()
 	}
 
 	Report interface {
@@ -44,16 +47,17 @@ type (
 	}
 
 	Maintenance interface {
-		CreateMaintenance()
-		GetMaintenance()
-		GetAllMaintenance()
-		DeleteMaintenance()
-		UpdateMaintenance()
+		GetAll()
+		GetById()
+
+		Create()
+		Delete()
+		Update()
 	}
 
 	Token interface {
 		GetTokenByUserId(userId int) (domain.Token, error)
-		FindToken(refreshToken string) (domain.Token, error)
+		FindRefreshToken(refreshToken string) (domain.Token, error)
 		SaveRefreshToken(userId int, refreshToken string) (int, error)
 		UpdateToken(userId int, refreshToken string) error
 		DeleteToken(refreshToken string) error

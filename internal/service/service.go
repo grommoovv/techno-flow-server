@@ -21,9 +21,12 @@ type (
 	}
 
 	Equipment interface {
-		CreateEquipment(dto domain.EquipmentCreateDto) (int, error)
 		GetAllEquipment() ([]domain.Equipment, error)
+		GetAvailableEquipment() ([]domain.Equipment, error)
 		GetEquipmentById(id int) (domain.Equipment, error)
+		GetEquipmentUsageHistoryById(id int) ([]domain.EquipmentUsageHistory, error)
+
+		CreateEquipment(dto domain.EquipmentCreateDto) (int, error)
 		DeleteEquipment(id int) (int, error)
 		UpdateEquipment(id int, dto domain.EquipmentUpdateDto) error
 	}
@@ -58,7 +61,7 @@ type (
 		ParseRefreshToken(accessToken string) (int, error)
 		ParseAccessToken(accessToken string) (int, error)
 		GetTokenByUserId(userId int) (domain.Token, error)
-		FindToken(refreshToken string) (domain.Token, error)
+		FindRefreshToken(refreshToken string) (domain.Token, error)
 		SaveRefreshToken(userId int, refreshToken string) (int, error)
 		UpdateRefreshToken(userId int, refreshToken string) error
 		DeleteRefreshToken(refreshToken string) error
@@ -78,11 +81,13 @@ type (
 func New(repos *repository.Repository) *Service {
 	tokenService := NewTokenService(repos.Token)
 	userService := NewUserService(repos.User, tokenService)
+	equipmentService := NewEquipmentService(repos.Equipment)
+
 	return &Service{
 		Auth:        NewAuthService(repos.Auth, tokenService, userService),
 		User:        userService,
-		Equipment:   NewEquipmentService(repos.Equipment),
-		Event:       NewEventService(repos.Event),
+		Equipment:   equipmentService,
+		Event:       NewEventService(repos.Event, equipmentService),
 		Report:      NewReportService(repos.Report),
 		Maintenance: NewMaintenanceService(repos.Maintenance),
 		Token:       tokenService,

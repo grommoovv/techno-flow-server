@@ -14,21 +14,29 @@ func NewEquipmentService(repo repository.Equipment) *EquipmentService {
 }
 
 func (es *EquipmentService) CreateEquipment(dto domain.EquipmentCreateDto) (int, error) {
-	return es.repo.CreateEquipment(dto)
+	return es.repo.Create(dto)
 }
 
 func (es *EquipmentService) GetAllEquipment() ([]domain.Equipment, error) {
-	return es.repo.GetAllEquipment()
+	return es.repo.GetAll()
+}
+
+func (es *EquipmentService) GetAvailableEquipment() ([]domain.Equipment, error) {
+	return es.repo.GetAvailable()
 }
 
 func (es *EquipmentService) GetEquipmentById(id int) (domain.Equipment, error) {
-	return es.repo.GetEquipmentById(id)
+	return es.repo.GetById(id)
+}
+
+func (es *EquipmentService) GetEquipmentUsageHistoryById(id int) ([]domain.EquipmentUsageHistory, error) {
+	return es.repo.GetUsageHistoryById(id)
 }
 
 func (es *EquipmentService) DeleteEquipment(id int) (int, error) {
-	return es.repo.DeleteEquipment(id)
+	return es.repo.Delete(id)
 }
 
 func (es *EquipmentService) UpdateEquipment(id int, dto domain.EquipmentUpdateDto) error {
-	return es.repo.UpdateEquipment(id, dto)
+	return es.repo.Update(id, dto)
 }

@@ -29,7 +29,6 @@ func (ts *TokenService) NewRefreshToken(userId int, username string) (string, er
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(REFRESH_TOKEN_TTL).Unix(),
-			IssuedAt:  time.Now().Unix(),
 			Subject:   username,
 		},
 		userId,
@@ -42,7 +41,6 @@ func (ts *TokenService) NewAccessToken(userId int, username string) (string, err
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(ACCESS_TOKEN_TTL).Unix(),
-			IssuedAt:  time.Now().Unix(),
 			Subject:   username,
 		},
 		userId,
@@ -99,8 +97,8 @@ func (ts *TokenService) GetTokenByUserId(userId int) (domain.Token, error) {
 	return ts.repo.GetTokenByUserId(userId)
 }
 
-func (ts *TokenService) FindToken(refreshToken string) (domain.Token, error) {
-	return ts.repo.FindToken(refreshToken)
+func (ts *TokenService) FindRefreshToken(refreshToken string) (domain.Token, error) {
+	return ts.repo.FindRefreshToken(refreshToken)
 }
 
 func (ts *TokenService) SaveRefreshToken(userId int, refreshToken string) (int, error) {

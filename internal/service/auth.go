@@ -80,7 +80,7 @@ func (as *AuthService) Refresh(refreshToken string) (domain.User, string, string
 		return domain.User{}, "", "", errors.New("unauthorized")
 	}
 
-	_, err = as.FindToken(refreshToken)
+	_, err = as.FindRefreshToken(refreshToken)
 
 	if err != nil {
 		fmt.Printf("error finding token: %s\n", err.Error())
