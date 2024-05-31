@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 )
 
 type TokenRepository struct {
@@ -15,8 +15,8 @@ func NewTokenRepository(db *sqlx.DB) *TokenRepository {
 	return &TokenRepository{db: db}
 }
 
-func (tr *TokenRepository) GetTokenByUserId(userId int) (domain.Token, error) {
-	var token domain.Token
+func (tr *TokenRepository) GetTokenByUserId(userId int) (entities.Token, error) {
+	var token entities.Token
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postgres.TokensTable)
 
@@ -25,8 +25,8 @@ func (tr *TokenRepository) GetTokenByUserId(userId int) (domain.Token, error) {
 	return token, err
 }
 
-func (tr *TokenRepository) FindRefreshToken(refreshToken string) (domain.Token, error) {
-	var token domain.Token
+func (tr *TokenRepository) FindRefreshToken(refreshToken string) (entities.Token, error) {
+	var token entities.Token
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE refresh_token = $1", postgres.TokensTable)
 

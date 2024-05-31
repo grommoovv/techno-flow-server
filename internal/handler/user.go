@@ -3,12 +3,12 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"strconv"
 )
 
 func (h *Handler) CreateUser(c *gin.Context) {
-	var userDto domain.UserCreateDto
+	var userDto entities.UserCreateDto
 
 	if err := c.BindJSON(&userDto); err != nil {
 		ResponseError(c, "failed to bind user dto", err.Error(), http.StatusInternalServerError)
@@ -82,7 +82,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	var userUpdateDto domain.UserUpdateDto
+	var userUpdateDto entities.UserUpdateDto
 
 	if err := c.BindJSON(&userUpdateDto); err != nil {
 		ResponseError(c, "failed to bind user dto", err.Error(), http.StatusInternalServerError)

@@ -43,7 +43,8 @@ func (h *Handler) Init() *gin.Engine {
 				equipment.POST("", h.CreateEquipment)
 				equipment.GET("", h.GetAllEquipment)
 				equipment.GET("/:id", h.GetEquipmentById)
-				equipment.GET("/usage/:id", h.GetEquipmentReservationDatesById)
+				equipment.POST("/available", h.GetAvailableEquipmentByDate)
+				equipment.GET("/history/:id", h.GetEquipmentUsageHistoryById)
 				equipment.DELETE("/:id", h.DeleteEquipment)
 				equipment.PATCH("/:id", h.UpdateEquipment)
 			}

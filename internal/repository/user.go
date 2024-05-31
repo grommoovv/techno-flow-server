@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur *UserRepository) Create(dto domain.UserCreateDto) (int, error) {
+func (ur *UserRepository) Create(dto entities.UserCreateDto) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (username, password) values ($1, $2) RETURNING id", postgres.UsersTable)
@@ -29,8 +29,8 @@ func (ur *UserRepository) Create(dto domain.UserCreateDto) (int, error) {
 	return id, nil
 }
 
-func (ur *UserRepository) GetAll() ([]domain.User, error) {
-	var users []domain.User
+func (ur *UserRepository) GetAll() ([]entities.User, error) {
+	var users []entities.User
 	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.UsersTable)
 	if err := ur.db.Select(&users, query); err != nil {
 		return nil, err
@@ -38,8 +38,8 @@ func (ur *UserRepository) GetAll() ([]domain.User, error) {
 	return users, nil
 }
 
-func (ur *UserRepository) GetById(id int) (domain.User, error) {
-	var user domain.User
+func (ur *UserRepository) GetById(id int) (entities.User, error) {
+	var user entities.User
 
 	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE id = $1", postgres.UsersTable)
 
@@ -48,8 +48,8 @@ func (ur *UserRepository) GetById(id int) (domain.User, error) {
 	return user, err
 }
 
-func (ur *UserRepository) GetByCredentials(userDto domain.UserSignInDto) (domain.User, error) {
-	var user domain.User
+func (ur *UserRepository) GetByCredentials(userDto entities.UserSignInDto) (entities.User, error) {
+	var user entities.User
 
 	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE username = $1 AND password = $2", postgres.UsersTable)
 
@@ -67,7 +67,7 @@ func (ur *UserRepository) Delete(id int) (int, error) {
 	return id, nil
 }
 
-func (ur *UserRepository) Update(id int, userDto domain.UserUpdateDto) error {
+func (ur *UserRepository) Update(id int, userDto entities.UserUpdateDto) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1

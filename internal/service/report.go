@@ -2,7 +2,7 @@ package service
 
 import (
 	"github.com/sirupsen/logrus"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
 )
 
@@ -15,8 +15,8 @@ func NewReportService(repo repository.Report, EquipmentService *EquipmentService
 	return &ReportService{repo: repo, equipmentService: *EquipmentService}
 }
 
-func (rs *ReportService) CreateReport(dto domain.ReportCreateDto) (int, error) {
-	var updateEquipmentDto domain.EquipmentUpdateDto
+func (rs *ReportService) CreateReport(dto entities.ReportCreateDto) (int, error) {
+	var updateEquipmentDto entities.EquipmentUpdateDto
 	status := "На обслуживании"
 	updateEquipmentDto.Status = &status
 
@@ -32,15 +32,15 @@ func (rs *ReportService) CreateReport(dto domain.ReportCreateDto) (int, error) {
 	return reportID, err
 }
 
-func (rs *ReportService) GetAllReports() ([]domain.Report, error) {
+func (rs *ReportService) GetAllReports() ([]entities.Report, error) {
 	return rs.repo.GetAllReports()
 }
 
-func (rs *ReportService) GetReportById(id int) (domain.Report, error) {
+func (rs *ReportService) GetReportById(id int) (entities.Report, error) {
 	return rs.repo.GetReportById(id)
 }
 
-func (rs *ReportService) DeleteReport(id int) (int, error) {
+func (rs *ReportService) DeleteReport(id int) error {
 	return rs.repo.DeleteReport(id)
 }
 

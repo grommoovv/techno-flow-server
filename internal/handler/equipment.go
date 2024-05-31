@@ -3,15 +3,15 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"strconv"
 )
 
 func (h *Handler) CreateEquipment(c *gin.Context) {
-	var equipmentDto domain.EquipmentCreateDto
+	var equipmentDto entities.EquipmentCreateDto
 
 	if err := c.BindJSON(&equipmentDto); err != nil {
-		ResponseError(c, "failed to bind equipment dto", err.Error(), http.StatusInternalServerError)
+		ResponseError(c, "failed to bind equipment dto", err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -36,6 +36,30 @@ func (h *Handler) GetAllEquipment(c *gin.Context) {
 	ResponseSuccess(c, "equipment fetched successfully", equipment)
 }
 
+func (h *Handler) GetAvailableEquipmentByDate(c *gin.Context) {
+
+	var dto entities.GetAvailableEquipmentByDateDto
+
+	if err := c.BindJSON(&dto); err != nil {
+		ResponseError(c, "failed to bind equipment dto", err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	equipment, err := h.services.Equipment.GetAvailableEquipmentByDate(dto)
+
+	if err != nil {
+		ResponseError(c, "failed to fetch available equipment", err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if equipment == nil {
+		ResponseError(c, "failed to fetch available equipment", "no available equipment", http.StatusInternalServerError)
+		return
+	}
+
+	ResponseSuccess(c, "available equipment fetched successfully", equipment)
+}
+
 func (h *Handler) GetEquipmentById(c *gin.Context) {
 	paramId := c.Param("id")
 
@@ -55,7 +79,7 @@ func (h *Handler) GetEquipmentById(c *gin.Context) {
 	ResponseSuccess(c, "equipment fetched successfully", equipment)
 }
 
-func (h *Handler) GetEquipmentReservationDatesById(c *gin.Context) {
+func (h *Handler) GetEquipmentUsageHistoryById(c *gin.Context) {
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -101,7 +125,7 @@ func (h *Handler) UpdateEquipment(c *gin.Context) {
 		return
 	}
 
-	var equipmentUpdateDto domain.EquipmentUpdateDto
+	var equipmentUpdateDto entities.EquipmentUpdateDto
 
 	if err := c.BindJSON(&equipmentUpdateDto); err != nil {
 		ResponseError(c, "failed to bind equipment dto", err.Error(), http.StatusInternalServerError)

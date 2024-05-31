@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
 	"time"
 )
@@ -93,11 +93,11 @@ func (ts *TokenService) ParseAccessToken(accessToken string) (int, error) {
 	return claims.UserId, nil
 }
 
-func (ts *TokenService) GetTokenByUserId(userId int) (domain.Token, error) {
+func (ts *TokenService) GetTokenByUserId(userId int) (entities.Token, error) {
 	return ts.repo.GetTokenByUserId(userId)
 }
 
-func (ts *TokenService) FindRefreshToken(refreshToken string) (domain.Token, error) {
+func (ts *TokenService) FindRefreshToken(refreshToken string) (entities.Token, error) {
 	return ts.repo.FindRefreshToken(refreshToken)
 }
 

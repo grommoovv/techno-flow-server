@@ -1,4 +1,4 @@
-package domain
+package entities
 
 import "time"
 
@@ -8,4 +8,7 @@ type Maintenance struct {
 	EndDate     time.Time `json:"end_date" db:"end_date"`
 	Timeline    string    `json:"timeline"`
 	EquipmentId int       `json:"equipment_id" db:"equipment_id"`
+}
+
+type MaintenanceCreateDto struct {
 }

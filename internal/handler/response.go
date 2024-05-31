@@ -8,21 +8,21 @@ import (
 )
 
 type DataResponse struct {
-	Status    string       `json:"status"`
-	Message   string       `json:"message"`
-	Data      *interface{} `json:"data"`
-	Error     *string      `json:"error"`
-	Code      int          `json:"code"`
-	Timestamp time.Time    `json:"timestamp"`
+	Status     string       `json:"status"`
+	StatusCode int          `json:"status_code"`
+	Message    string       `json:"message"`
+	Error      *string      `json:"error"`
+	Data       *interface{} `json:"data"`
+	Timestamp  time.Time    `json:"timestamp"`
 }
 
 func ResponseSuccess(c *gin.Context, message string, data interface{}) {
 	resp := DataResponse{
-		Status:    "success",
-		Message:   strings.ToLower(message),
-		Data:      &data,
-		Code:      200,
-		Timestamp: time.Now().UTC(),
+		Status:     "success",
+		StatusCode: 200,
+		Message:    strings.ToLower(message),
+		Data:       &data,
+		Timestamp:  time.Now().UTC(),
 	}
 	c.JSON(http.StatusOK, resp)
 }
@@ -30,11 +30,11 @@ func ResponseSuccess(c *gin.Context, message string, data interface{}) {
 func ResponseError(c *gin.Context, message string, err string, code int) {
 	err = strings.ToLower(err)
 	resp := DataResponse{
-		Status:    "error",
-		Message:   strings.ToLower(message),
-		Error:     &err,
-		Code:      code,
-		Timestamp: time.Now().UTC(),
+		Status:     "error",
+		StatusCode: code,
+		Message:    strings.ToLower(message),
+		Error:      &err,
+		Timestamp:  time.Now().UTC(),
 	}
-	c.JSON(http.StatusOK, resp)
+	c.JSON(code, resp)
 }

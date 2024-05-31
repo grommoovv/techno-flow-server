@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 )
 
 type ReportRepository struct {
@@ -15,7 +15,7 @@ func NewReportRepository(db *sqlx.DB) *ReportRepository {
 	return &ReportRepository{db: db}
 }
 
-func (rr *ReportRepository) CreateReport(dto domain.ReportCreateDto) (int, error) {
+func (rr *ReportRepository) CreateReport(dto entities.ReportCreateDto) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (message, user_id, equipment_id) values ($1, $2, $3) RETURNING id", postgres.ReportsTable)
@@ -28,8 +28,8 @@ func (rr *ReportRepository) CreateReport(dto domain.ReportCreateDto) (int, error
 	return id, nil
 }
 
-func (rr *ReportRepository) GetAllReports() ([]domain.Report, error) {
-	var reports []domain.Report
+func (rr *ReportRepository) GetAllReports() ([]entities.Report, error) {
+	var reports []entities.Report
 	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.ReportsTable)
 	if err := rr.db.Select(&reports, query); err != nil {
 		return nil, err
@@ -37,8 +37,8 @@ func (rr *ReportRepository) GetAllReports() ([]domain.Report, error) {
 	return reports, nil
 }
 
-func (rr *ReportRepository) GetReportById(id int) (domain.Report, error) {
-	var report domain.Report
+func (rr *ReportRepository) GetReportById(id int) (entities.Report, error) {
+	var report entities.Report
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", postgres.ReportsTable)
 
@@ -47,13 +47,13 @@ func (rr *ReportRepository) GetReportById(id int) (domain.Report, error) {
 	return report, err
 }
 
-func (rr *ReportRepository) DeleteReport(id int) (int, error) {
+func (rr *ReportRepository) DeleteReport(id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.ReportsTable)
 	if _, err := rr.db.Exec(query, id); err != nil {
-		return 0, err
+		return err
 	}
 
-	return id, nil
+	return nil
 }
 
 func (rr *ReportRepository) UpdateReport() {}

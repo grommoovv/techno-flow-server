@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"time"
 )
 
 type SignInResponse struct {
-	User        domain.User `json:"user"`
-	AccessToken string      `json:"access_token"`
+	User        entities.User `json:"user"`
+	AccessToken string        `json:"access_token"`
 }
 
 func (h *Handler) signIn(c *gin.Context) {
 	fmt.Println("signIp called")
 
-	var signInDto domain.UserSignInDto
+	var signInDto entities.UserSignInDto
 
 	if err := c.BindJSON(&signInDto); err != nil {
 		ResponseError(c, "failed to bind sign-in dto", err.Error(), http.StatusInternalServerError)

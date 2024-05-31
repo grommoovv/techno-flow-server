@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 )
 
 type EventRepository struct {
@@ -15,13 +15,13 @@ func NewEventRepository(db *sqlx.DB) *EventRepository {
 	return &EventRepository{db: db}
 }
 
-func (er *EventRepository) Create(dto domain.EventCreateDto) (int, error) {
+func (er *EventRepository) Create(dto entities.EventCreateDto) (int, error) {
 	var eventID int
 
 	for _, equipmentID := range dto.EquipmentIDs {
 		var count int
 
-		query := fmt.Sprintf("SELECT COUNT(*) FROM equipment_usage WHERE equipment_id = $1 AND (start_date <= $2 AND end_date >= $2 OR start_date <= $3 AND end_date >= $3 OR start_date >= $2 AND end_date <= $3)")
+		query := fmt.Sprintf("SELECT COUNT(*) FROM %s eu LEFT JOIN %s r ON eu.equipment_id = r.equipment_id WHERE eu.equipment_id = $1 AND r.equipment_id IS NULL AND ( eu.start_date <= $2 AND eu.end_date >= $2 OR eu.start_date <= $3 AND eu.end_date >= $3 OR eu.start_date >= $2 AND eu.end_date <= $3)", postgres.EquipmentUsageTable, postgres.ReportsTable)
 
 		if err := er.db.QueryRow(query, equipmentID, dto.StartDate, dto.EndDate).Scan(&count); err != nil {
 			return 0, err
@@ -51,17 +51,17 @@ func (er *EventRepository) Create(dto domain.EventCreateDto) (int, error) {
 	return eventID, nil
 }
 
-func (er *EventRepository) GetAll() ([]domain.Event, error) {
-	var events []domain.Event
-	query := fmt.Sprintf("SELECT e.id, e.title, e.type, e.start_date, e.end_date,  e.duration, e.status, e.user_id, u.username FROM %s e JOIN %s u on e.user_id = u.id ORDER BY e.id ASC", postgres.EventsTable, postgres.UsersTable)
+func (er *EventRepository) GetAll() ([]entities.Event, error) {
+	var events []entities.Event
+	query := fmt.Sprintf("SELECT e.id, e.title, e.type, e.start_date, e.end_date,  e.duration, e.status, e.user_id, u.username FROM %s e JOIN %s u on e.user_id = u.id ORDER BY e.start_date ASC", postgres.EventsTable, postgres.UsersTable)
 	if err := er.db.Select(&events, query); err != nil {
 		return nil, err
 	}
 	return events, nil
 }
 
-func (er *EventRepository) GetById(id int) (domain.Event, error) {
-	var event domain.Event
+func (er *EventRepository) GetById(id int) (entities.Event, error) {
+	var event entities.Event
 
 	query := fmt.Sprintf("SELECT id, title, type, start_date, end_date, duration, status, user_id FROM %s WHERE id = $1", postgres.EventsTable)
 
@@ -70,8 +70,8 @@ func (er *EventRepository) GetById(id int) (domain.Event, error) {
 	return event, err
 }
 
-func (er *EventRepository) GetByUserId(id int) ([]domain.Event, error) {
-	var events []domain.Event
+func (er *EventRepository) GetByUserId(id int) ([]entities.Event, error) {
+	var events []entities.Event
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postgres.EventsTable)
 
@@ -82,12 +82,12 @@ func (er *EventRepository) GetByUserId(id int) ([]domain.Event, error) {
 	return events, nil
 }
 
-func (er *EventRepository) Delete(id int) (int, error) {
+func (er *EventRepository) Delete(id int) error {
 
 	query := fmt.Sprintf("SELECT equipment_id FROM %s WHERE event_id=$1", postgres.EquipmentUsageTable)
 	rows, err := er.db.Query(query, id)
 	if err != nil {
-		return 0, err
+		return err
 	}
 	defer rows.Close()
 
@@ -95,26 +95,26 @@ func (er *EventRepository) Delete(id int) (int, error) {
 		var equipmentID int
 		err := rows.Scan(&equipmentID)
 		if err != nil {
-			return 0, err
+			return err
 		}
 
 		query = fmt.Sprintf("UPDATE %s SET reserved_at=NULL WHERE id=$1", postgres.EquipmentTable)
 		if _, err := er.db.Exec(query, equipmentID); err != nil {
-			return 0, err
+			return err
 		}
 	}
 
 	query = fmt.Sprintf("DELETE FROM %s WHERE event_id=$1", postgres.EquipmentUsageTable)
 	if _, err := er.db.Exec(query, id); err != nil {
-		return 0, err
+		return err
 	}
 
 	query = fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.EventsTable)
 	if _, err := er.db.Exec(query, id); err != nil {
-		return 0, err
+		return err
 	}
 
-	return id, nil
+	return nil
 }
 
 func (er *EventRepository) Update() {}

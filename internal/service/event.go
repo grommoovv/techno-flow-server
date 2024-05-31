@@ -1,7 +1,7 @@
 package service
 
 import (
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
 )
 
@@ -14,8 +14,8 @@ func NewEventService(repo repository.Event, equipmentService *EquipmentService) 
 	return &EventService{repo: repo, EquipmentService: *equipmentService}
 }
 
-func (es *EventService) CreateEvent(dto domain.EventCreateDto) (int, error) {
-	//var updateEquipmentDto domain.EquipmentUpdateDto
+func (es *EventService) CreateEvent(dto entities.EventCreateDto) (int, error) {
+	//var updateEquipmentDto entities.EquipmentUpdateDto
 	//updateEquipmentDto.ReservedAt = &dto.StartDate
 	//
 	//for _, equipID := range dto.EquipmentId {
@@ -29,20 +29,20 @@ func (es *EventService) CreateEvent(dto domain.EventCreateDto) (int, error) {
 	return eventID, err
 }
 
-func (es *EventService) GetAllEvents() ([]domain.Event, error) {
+func (es *EventService) GetAllEvents() ([]entities.Event, error) {
 	return es.repo.GetAll()
 }
 
-func (es *EventService) GetEventById(id int) (domain.Event, error) {
+func (es *EventService) GetEventById(id int) (entities.Event, error) {
 	return es.repo.GetById(id)
 }
 
-func (es *EventService) GetEventsByUserId(id int) ([]domain.Event, error) {
+func (es *EventService) GetEventsByUserId(id int) ([]entities.Event, error) {
 	return es.repo.GetByUserId(id)
 }
 
-func (es *EventService) DeleteEvent(id int) (int, error) {
-	//var updateEquipmentDto domain.EquipmentUpdateDto
+func (es *EventService) DeleteEvent(id int) error {
+	//var updateEquipmentDto entities.EquipmentUpdateDto
 	//updateEquipmentDto.ReservedAt = &dto.StartDate
 	//
 	//for _, equipID := range dto.EquipmentId {
@@ -51,9 +51,9 @@ func (es *EventService) DeleteEvent(id int) (int, error) {
 	//	}
 	//}
 
-	eventID, err := es.repo.Delete(id)
+	err := es.repo.Delete(id)
 
-	return eventID, err
+	return err
 }
 
 func (es *EventService) UpdateEvent() {}

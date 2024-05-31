@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"strings"
 )
 
@@ -16,7 +16,7 @@ func NewEquipmentRepository(db *sqlx.DB) *EquipmentRepository {
 	return &EquipmentRepository{db: db}
 }
 
-func (er *EquipmentRepository) Create(dto domain.EquipmentCreateDto) (int, error) {
+func (er *EquipmentRepository) Create(dto entities.EquipmentCreateDto) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (title, status) values ($1, $2) RETURNING id", postgres.EquipmentTable)
@@ -29,8 +29,8 @@ func (er *EquipmentRepository) Create(dto domain.EquipmentCreateDto) (int, error
 	return id, nil
 }
 
-func (er *EquipmentRepository) GetAll() ([]domain.Equipment, error) {
-	var equipment []domain.Equipment
+func (er *EquipmentRepository) GetAll() ([]entities.Equipment, error) {
+	var equipment []entities.Equipment
 
 	query := fmt.Sprintf("SELECT e.id, e.title, e.status, e.created_at, CASE WHEN eu.equipment_id IS NULL AND r.equipment_id IS NULL THEN true ELSE false END AS is_available FROM %s e LEFT JOIN %s eu ON e.id = eu.equipment_id AND current_date BETWEEN eu.start_date AND eu.end_date LEFT JOIN %s r ON e.id = r.equipment_id ORDER BY e.id ASC", postgres.EquipmentTable, postgres.EquipmentUsageTable, postgres.ReportsTable)
 	if err := er.db.Select(&equipment, query); err != nil {
@@ -40,19 +40,39 @@ func (er *EquipmentRepository) GetAll() ([]domain.Equipment, error) {
 	return equipment, nil
 }
 
-func (er *EquipmentRepository) GetAvailable() ([]domain.Equipment, error) {
-	var equipment []domain.Equipment
+func (er *EquipmentRepository) GetAvailableByDate(dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error) {
+	var equipment []entities.Equipment
 
-	query := fmt.Sprintf("SELECT e.* FROM %s e WHERE e.id NOT IN ( SELECT eu.equipment_id FROM %s eu WHERE current_date BETWEEN eu.start_date AND eu.end_date) ORDER BY id ASC", postgres.EquipmentTable, postgres.EquipmentUsageTable)
-	if err := er.db.Select(&equipment, query); err != nil {
+	fmt.Printf("start_date: %v\n end_date: %v\n", dto.StartDate, dto.EndDate)
+
+	query := fmt.Sprintf(`
+        SELECT e.* FROM %s e 
+        WHERE e.id NOT IN (
+            SELECT eu.equipment_id 
+            FROM %s eu 
+            WHERE 
+                (eu.start_date <= $1 AND eu.end_date >= $1) OR 
+                (eu.start_date <= $2 AND eu.end_date >= $2) OR 
+                (eu.start_date >= $1 AND eu.end_date <= $2)
+        ) 
+        AND e.id NOT IN (
+            SELECT r.equipment_id 
+            FROM reports r
+        ) 
+        ORDER BY e.id ASC`,
+		postgres.EquipmentTable, postgres.EquipmentUsageTable)
+
+	if err := er.db.Select(&equipment, query, dto.StartDate, dto.EndDate); err != nil {
 		return nil, err
 	}
+
+	fmt.Println(equipment)
 
 	return equipment, nil
 }
 
-func (er *EquipmentRepository) GetById(id int) (domain.Equipment, error) {
-	var equipment domain.Equipment
+func (er *EquipmentRepository) GetById(id int) (entities.Equipment, error) {
+	var equipment entities.Equipment
 
 	query := fmt.Sprintf("SELECT e.id, e.title, e.status, e.created_at,  CASE WHEN eu.equipment_id IS NULL AND r.equipment_id IS NULL THEN true ELSE false END AS is_available FROM %s e LEFT JOIN %s eu ON e.id = eu.equipment_id AND CURRENT_DATE BETWEEN eu.start_date AND eu.end_date LEFT JOIN %s r ON e.id = r.equipment_id WHERE e.id = $1", postgres.EquipmentTable, postgres.EquipmentUsageTable, postgres.ReportsTable)
 
@@ -61,8 +81,8 @@ func (er *EquipmentRepository) GetById(id int) (domain.Equipment, error) {
 	return equipment, err
 }
 
-func (er *EquipmentRepository) GetUsageHistoryById(id int) ([]domain.EquipmentUsageHistory, error) {
-	dates := make([]domain.EquipmentUsageHistory, 0)
+func (er *EquipmentRepository) GetUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error) {
+	dates := make([]entities.EquipmentUsageHistory, 0)
 
 	query := fmt.Sprintf("SELECT eu.id, u.username AS username, e.title AS event_title, eu.start_date, eu.end_date FROM %s eu JOIN users u ON u.id = eu.user_id JOIN events e ON e.id = eu.event_id WHERE eu.equipment_id = $1 ORDER BY eu.start_date ASC", postgres.EquipmentUsageTable)
 
@@ -94,7 +114,7 @@ func (er *EquipmentRepository) Delete(id int) (int, error) {
 	return id, nil
 }
 
-func (er *EquipmentRepository) Update(id int, dto domain.EquipmentUpdateDto) error {
+func (er *EquipmentRepository) Update(id int, dto entities.EquipmentUpdateDto) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1

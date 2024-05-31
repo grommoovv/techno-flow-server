@@ -1,4 +1,4 @@
-package domain
+package entities
 
 import "time"
 
@@ -7,7 +7,7 @@ type Equipment struct {
 	Title       string    `json:"title"`
 	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	IsAvailable bool      `json:"is_available" db:"is_available"`
+	IsAvailable *bool     `json:"is_available" db:"is_available"`
 }
 
 type EquipmentCreateDto struct {
@@ -30,4 +30,9 @@ type EquipmentUsageHistory struct {
 	EventTitle string    `json:"event_title" db:"event_title"`
 	StartDate  time.Time `json:"start_date" db:"start_date"`
 	EndDate    time.Time `json:"end_date" db:"end_date"`
+}
+
+type GetAvailableEquipmentByDateDto struct {
+	StartDate time.Time `json:"start_date" db:"start_date"`
+	EndDate   time.Time `json:"end_date" db:"end_date"`
 }

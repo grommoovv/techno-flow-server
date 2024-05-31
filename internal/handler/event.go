@@ -3,12 +3,12 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 	"strconv"
 )
 
 func (h *Handler) CreateEvent(c *gin.Context) {
-	var eventDto domain.EventCreateDto
+	var eventDto entities.EventCreateDto
 
 	if err := c.BindJSON(&eventDto); err != nil {
 		ResponseError(c, "failed to bind event dto", err.Error(), http.StatusInternalServerError)
@@ -83,7 +83,7 @@ func (h *Handler) DeleteEvent(c *gin.Context) {
 		return
 	}
 
-	_, err = h.services.Event.DeleteEvent(id)
+	err = h.services.Event.DeleteEvent(id)
 	if err != nil {
 		ResponseError(c, "failed to delete event", err.Error(), http.StatusInternalServerError)
 		return

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"github.com/jmoiron/sqlx"
-	"server-techno-flow/internal/domain"
+	"server-techno-flow/internal/entities"
 )
 
 type (
@@ -12,55 +12,56 @@ type (
 	}
 
 	User interface {
-		GetAll() ([]domain.User, error)
-		GetById(id int) (domain.User, error)
-		GetByCredentials(dto domain.UserSignInDto) (domain.User, error)
+		GetAll() ([]entities.User, error)
+		GetById(id int) (entities.User, error)
+		GetByCredentials(dto entities.UserSignInDto) (entities.User, error)
 
-		Create(dto domain.UserCreateDto) (int, error)
+		Create(dto entities.UserCreateDto) (int, error)
 		Delete(id int) (int, error)
-		Update(id int, dto domain.UserUpdateDto) error
+		Update(id int, dto entities.UserUpdateDto) error
 	}
 
 	Equipment interface {
-		GetAll() ([]domain.Equipment, error)
-		GetAvailable() ([]domain.Equipment, error)
-		GetById(id int) (domain.Equipment, error)
-		GetUsageHistoryById(id int) ([]domain.EquipmentUsageHistory, error)
+		GetAll() ([]entities.Equipment, error)
+		GetAvailableByDate(dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error)
+		GetById(id int) (entities.Equipment, error)
+		GetUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error)
 
-		Create(dto domain.EquipmentCreateDto) (int, error)
+		Create(dto entities.EquipmentCreateDto) (int, error)
 		Delete(id int) (int, error)
-		Update(id int, dto domain.EquipmentUpdateDto) error
+		Update(id int, dto entities.EquipmentUpdateDto) error
 	}
 
 	Event interface {
-		GetAll() ([]domain.Event, error)
-		GetById(id int) (domain.Event, error)
-		GetByUserId(id int) ([]domain.Event, error)
-		Create(dto domain.EventCreateDto) (int, error)
-		Delete(id int) (int, error)
+		GetAll() ([]entities.Event, error)
+		GetById(id int) (entities.Event, error)
+		GetByUserId(id int) ([]entities.Event, error)
+
+		Create(dto entities.EventCreateDto) (int, error)
+		Delete(id int) error
 		Update()
 	}
 
 	Report interface {
-		CreateReport(dto domain.ReportCreateDto) (int, error)
-		GetAllReports() ([]domain.Report, error)
-		GetReportById(id int) (domain.Report, error)
-		DeleteReport(id int) (int, error)
+		GetAllReports() ([]entities.Report, error)
+		GetReportById(id int) (entities.Report, error)
+		CreateReport(dto entities.ReportCreateDto) (int, error)
+		DeleteReport(id int) error
 		UpdateReport()
 	}
 
 	Maintenance interface {
-		GetAll()
-		GetById()
+		GetAll() ([]entities.Maintenance, error)
+		GetById(id int) (entities.Maintenance, error)
 
-		Create()
-		Delete()
+		Create(dto entities.MaintenanceCreateDto) (int, error)
+		Delete(id int) error
 		Update()
 	}
 
 	Token interface {
-		GetTokenByUserId(userId int) (domain.Token, error)
-		FindRefreshToken(refreshToken string) (domain.Token, error)
+		GetTokenByUserId(userId int) (entities.Token, error)
+		FindRefreshToken(refreshToken string) (entities.Token, error)
 		SaveRefreshToken(userId int, refreshToken string) (int, error)
 		UpdateToken(userId int, refreshToken string) error
 		DeleteToken(refreshToken string) error
