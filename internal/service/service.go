@@ -1,6 +1,7 @@
 package service
 
 import (
+	"math/rand"
 	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
 )
@@ -25,6 +26,7 @@ type (
 		GetAllEquipment() ([]entities.Equipment, error)
 		GetAvailableEquipmentByDate(dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error)
 		GetEquipmentById(id int) (entities.Equipment, error)
+		GetEquipmentByEventId(id int) ([]entities.Equipment, error)
 		GetEquipmentUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error)
 
 		CreateEquipment(dto entities.EquipmentCreateDto) (int, error)
@@ -55,7 +57,7 @@ type (
 		GetById(id int) (entities.Maintenance, error)
 
 		Create(dto entities.MaintenanceCreateDto) (int, error)
-		Delete()
+		Delete(id int) error
 		Update()
 	}
 
@@ -82,18 +84,19 @@ type (
 	}
 )
 
-func New(repos *repository.Repository) *Service {
+func New(repos *repository.Repository, r *rand.Rand) *Service {
 	tokenService := NewTokenService(repos.Token)
 	userService := NewUserService(repos.User, tokenService)
 	equipmentService := NewEquipmentService(repos.Equipment)
+	maintenanceService := NewMaintenanceService(repos.Maintenance, r)
 
 	return &Service{
 		Auth:        NewAuthService(repos.Auth, tokenService, userService),
 		User:        userService,
 		Equipment:   equipmentService,
 		Event:       NewEventService(repos.Event, equipmentService),
-		Report:      NewReportService(repos.Report, equipmentService),
-		Maintenance: NewMaintenanceService(repos.Maintenance),
+		Report:      NewReportService(repos.Report, equipmentService, maintenanceService),
+		Maintenance: maintenanceService,
 		Token:       tokenService,
 	}
 }

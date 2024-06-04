@@ -29,6 +29,10 @@ func (es *EquipmentService) GetEquipmentById(id int) (entities.Equipment, error)
 	return es.repo.GetById(id)
 }
 
+func (es *EquipmentService) GetEquipmentByEventId(id int) ([]entities.Equipment, error) {
+	return es.repo.GetByEventId(id)
+}
+
 func (es *EquipmentService) GetEquipmentUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error) {
 	return es.repo.GetUsageHistoryById(id)
 }

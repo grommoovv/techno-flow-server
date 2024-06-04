@@ -63,9 +63,14 @@ func (er *EventRepository) GetAll() ([]entities.Event, error) {
 func (er *EventRepository) GetById(id int) (entities.Event, error) {
 	var event entities.Event
 
-	query := fmt.Sprintf("SELECT id, title, type, start_date, end_date, duration, status, user_id FROM %s WHERE id = $1", postgres.EventsTable)
+	query := fmt.Sprintf(`
+        SELECT e.id, e.title, e.type, e.start_date, e.end_date, e.duration, e.status, e.user_id, u.username
+        FROM %s e
+        JOIN %s u ON e.user_id = u.id
+        WHERE e.id = $1`,
+		postgres.EventsTable, postgres.UsersTable)
 
-	err := er.db.QueryRow(query, id).Scan(&event.ID, &event.Title, &event.Type, &event.StartDate, &event.EndDate, &event.Duration, &event.Status, &event.UserID)
+	err := er.db.QueryRow(query, id).Scan(&event.ID, &event.Title, &event.Type, &event.StartDate, &event.EndDate, &event.Duration, &event.Status, &event.UserID, &event.Username)
 
 	return event, err
 }

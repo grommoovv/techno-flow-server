@@ -25,6 +25,7 @@ type (
 		GetAll() ([]entities.Equipment, error)
 		GetAvailableByDate(dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error)
 		GetById(id int) (entities.Equipment, error)
+		GetByEventId(id int) ([]entities.Equipment, error)
 		GetUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error)
 
 		Create(dto entities.EquipmentCreateDto) (int, error)

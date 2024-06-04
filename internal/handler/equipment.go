@@ -79,6 +79,25 @@ func (h *Handler) GetEquipmentById(c *gin.Context) {
 	ResponseSuccess(c, "equipment fetched successfully", equipment)
 }
 
+func (h *Handler) GetEquipmentByEventId(c *gin.Context) {
+	paramId := c.Param("id")
+
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	equipment, err := h.services.Equipment.GetEquipmentByEventId(id)
+
+	if err != nil {
+		ResponseError(c, "failed to fetch equipment", err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ResponseSuccess(c, "equipment fetched successfully", equipment)
+}
+
 func (h *Handler) GetEquipmentUsageHistoryById(c *gin.Context) {
 	paramId := c.Param("id")
 

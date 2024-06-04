@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"math/rand"
 	"os"
 	"os/signal"
 	"server-techno-flow/internal/config"
@@ -18,6 +19,8 @@ import (
 )
 
 func Run() {
+	source := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(source)
 
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
@@ -28,7 +31,7 @@ func Run() {
 		return
 	}
 
-	ps, err := postgres.New(postgres.Postgres{
+	psql, err := postgres.New(postgres.Postgres{
 		Host:     conf.Postgres.Host,
 		Port:     conf.Postgres.Port,
 		Username: conf.Postgres.Username,
@@ -42,8 +45,8 @@ func Run() {
 		return
 	}
 
-	repos := repository.New(ps)
-	services := service.New(repos)
+	repos := repository.New(psql)
+	services := service.New(repos, random)
 	handlers := handler.New(services)
 
 	srv := server.New(conf, handlers.Init())
@@ -73,7 +76,7 @@ func Run() {
 
 	logrus.Infof("server gracefully shutdown")
 
-	if err := ps.Close(); err != nil {
+	if err := psql.Close(); err != nil {
 		logrus.Fatalf("error occured while closing postgres: %s", err.Error())
 	}
 

@@ -81,6 +81,22 @@ func (er *EquipmentRepository) GetById(id int) (entities.Equipment, error) {
 	return equipment, err
 }
 
+func (er *EquipmentRepository) GetByEventId(eventID int) ([]entities.Equipment, error) {
+	var equipment []entities.Equipment
+
+	query := fmt.Sprintf(`
+							SELECT e.* 
+							FROM %s e
+							JOIN %s eu ON eu.equipment_id = e.id
+							WHERE eu.event_id = $1`,
+		postgres.EquipmentTable, postgres.EquipmentUsageTable)
+	if err := er.db.Select(&equipment, query, eventID); err != nil {
+		return nil, err
+	}
+
+	return equipment, nil
+}
+
 func (er *EquipmentRepository) GetUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error) {
 	dates := make([]entities.EquipmentUsageHistory, 0)
 

@@ -18,9 +18,9 @@ func NewMaintenanceRepository(db *sqlx.DB) *MaintenanceRepository {
 func (mr *MaintenanceRepository) Create(dto entities.MaintenanceCreateDto) (int, error) {
 	var maintenanceID int
 
-	query := fmt.Sprintf("INSERT INTO %s () values () RETURNING id", postgres.MaintenanceTable)
+	query := fmt.Sprintf("INSERT INTO %s (equipment_id, fixed_in) values ($1, $2) RETURNING id", postgres.MaintenanceTable)
 
-	row := mr.db.QueryRow(query)
+	row := mr.db.QueryRow(query, dto.EquipmentId, dto.FixedIn)
 	if err := row.Scan(&maintenanceID); err != nil {
 		return 0, err
 	}
@@ -31,7 +31,12 @@ func (mr *MaintenanceRepository) Create(dto entities.MaintenanceCreateDto) (int,
 func (mr *MaintenanceRepository) GetAll() ([]entities.Maintenance, error) {
 	var maintenance []entities.Maintenance
 
-	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.MaintenanceTable)
+	query := fmt.Sprintf(`
+						SELECT m.id, m.equipment_id, e.title as equipment_title, m.fixed_in, m.created_at 
+						FROM %s m 
+						INNER JOIN %s e on m.equipment_id = e.id 
+						ORDER BY m.created_at DESC`,
+		postgres.MaintenanceTable, postgres.EquipmentTable)
 
 	if err := mr.db.Select(&maintenance, query); err != nil {
 		return nil, err
@@ -45,7 +50,7 @@ func (mr *MaintenanceRepository) GetById(id int) (entities.Maintenance, error) {
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", postgres.MaintenanceTable)
 
-	err := mr.db.QueryRow(query, id).Scan(&maintenance)
+	err := mr.db.QueryRow(query, id).Scan(&maintenance.Id, &maintenance.EquipmentId, &maintenance.FixedIn, &maintenance.CreatedAt)
 
 	return maintenance, err
 }
