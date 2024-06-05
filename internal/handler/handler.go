@@ -1,8 +1,10 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
 	"server-techno-flow/internal/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -20,6 +22,10 @@ func (h *Handler) Init() *gin.Engine {
 
 	api := handler.Group("/api/v1")
 	{
+		api.GET("/", func(c *gin.Context) {
+			c.String(http.StatusOK, "server works correctly")
+		})
+
 		auth := api.Group("/auth")
 		{
 			auth.POST("/sign-in", h.signIn)

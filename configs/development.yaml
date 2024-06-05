@@ -1,16 +1,16 @@
 server:
-  port: 8000
+  port: 8080
   maxHeaderBytes: 1
   readTimeout: 10s
   writeTimeout: 10s
 
 postgres:
-  username: "postgres"
-  password: "root"
-  host: "localhost"
-  port: "5432"
-  dbname: "techno-flow"
-  sslmode: "disable"
+  username: 'postgres'
+  password: 'root'
+  host: 'postgres'
+  port: '5432'
+  dbname: 'techno-flow'
+  sslmode: 'disable'
 
 jwt:
   accessTokenTTL: 2h

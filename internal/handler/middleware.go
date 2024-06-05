@@ -14,7 +14,7 @@ const (
 )
 
 func corsMiddleware(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
+	c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
 	//c.Header("Access-Control-Allow-Origin", "https://techno-flow-client.vercel.app")
 	c.Header("Access-Control-Allow-Methods", "*")
 	c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
