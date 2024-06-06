@@ -42,7 +42,7 @@ func (rs *ReportService) CreateReport(dto entities.ReportCreateDto) (int, error)
 		return 0, err
 	}
 
-	reportID, err := rs.repo.CreateReport(dto)
+	reportID, err := rs.repo.Create(dto)
 
 	if err != nil {
 		logrus.Errorf("error creating report: %v", err.Error())
@@ -53,15 +53,19 @@ func (rs *ReportService) CreateReport(dto entities.ReportCreateDto) (int, error)
 }
 
 func (rs *ReportService) GetAllReports() ([]entities.Report, error) {
-	return rs.repo.GetAllReports()
+	return rs.repo.GetAll()
 }
 
 func (rs *ReportService) GetReportById(id int) (entities.Report, error) {
-	return rs.repo.GetReportById(id)
+	return rs.repo.GetById(id)
+}
+
+func (rs *ReportService) GetReportsByUserId(id int) ([]entities.Report, error) {
+	return rs.repo.GetByUserId(id)
 }
 
 func (rs *ReportService) DeleteReport(id int) error {
-	return rs.repo.DeleteReport(id)
+	return rs.repo.Delete(id)
 }
 
 func (rs *ReportService) UpdateReport() {}

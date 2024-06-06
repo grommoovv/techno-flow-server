@@ -55,6 +55,25 @@ func (h *Handler) GetReportById(c *gin.Context) {
 	ResponseSuccess(c, "report fetched successfully", report)
 }
 
+func (h *Handler) GetReportsByUserId(c *gin.Context) {
+	paramId := c.Param("id")
+
+	id, err := strconv.Atoi(paramId)
+	if err != nil {
+		ResponseError(c, "invalid query id param", err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	reports, err := h.services.Report.GetReportsByUserId(id)
+
+	if err != nil {
+		ResponseError(c, "failed to fetch reports", err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ResponseSuccess(c, "reports fetched successfully", reports)
+}
+
 func (h *Handler) DeleteReport(c *gin.Context) {
 	paramId := c.Param("id")
 

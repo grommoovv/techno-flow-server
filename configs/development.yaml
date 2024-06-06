@@ -8,6 +8,7 @@ postgres:
   username: 'postgres'
   password: 'root'
   host: 'postgres'
+#  host: 'localhost'
   port: '5432'
   dbname: 'techno-flow'
   sslmode: 'disable'

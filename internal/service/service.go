@@ -46,6 +46,7 @@ type (
 	Report interface {
 		GetAllReports() ([]entities.Report, error)
 		GetReportById(id int) (entities.Report, error)
+		GetReportsByUserId(id int) ([]entities.Report, error)
 
 		CreateReport(dto entities.ReportCreateDto) (int, error)
 		DeleteReport(id int) error

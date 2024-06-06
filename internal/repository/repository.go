@@ -44,11 +44,13 @@ type (
 	}
 
 	Report interface {
-		GetAllReports() ([]entities.Report, error)
-		GetReportById(id int) (entities.Report, error)
-		CreateReport(dto entities.ReportCreateDto) (int, error)
-		DeleteReport(id int) error
-		UpdateReport()
+		GetAll() ([]entities.Report, error)
+		GetById(id int) (entities.Report, error)
+		GetByUserId(id int) ([]entities.Report, error)
+
+		Create(dto entities.ReportCreateDto) (int, error)
+		Delete(id int) error
+		Update()
 	}
 
 	Maintenance interface {

@@ -2,10 +2,11 @@ package repository
 
 import (
 	"fmt"
-	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
 	"server-techno-flow/internal/entities"
 	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type EquipmentRepository struct {
