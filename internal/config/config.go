@@ -39,7 +39,7 @@ type (
 func Init() (*Config, error) {
 
 	if err := readConfigFile(); err != nil {
-		logrus.Fatalf("error initializing configs: %s", err.Error())
+		logrus.Fatalf("error initializing config: %s", err.Error())
 	}
 
 	var config Config
@@ -52,7 +52,7 @@ func Init() (*Config, error) {
 }
 
 func readConfigFile() error {
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("config")
 	viper.SetConfigName("development")
 
 	return viper.ReadInConfig()

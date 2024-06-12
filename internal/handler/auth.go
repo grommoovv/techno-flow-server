@@ -14,7 +14,7 @@ type SignInResponse struct {
 }
 
 func (h *Handler) signIn(c *gin.Context) {
-	fmt.Println("signIp called")
+	const op = "auth/Handler.signIn"
 
 	var signInDto entities.UserSignInDto
 
@@ -50,6 +50,7 @@ func (h *Handler) signIn(c *gin.Context) {
 }
 
 func (h *Handler) signOut(c *gin.Context) {
+	const op = "auth/Handler.signOut"
 
 	refreshToken, err := c.Cookie("refresh_token")
 	if err != nil {
@@ -74,6 +75,7 @@ func (h *Handler) signOut(c *gin.Context) {
 }
 
 func (h *Handler) refresh(c *gin.Context) {
+	const op = "auth/Handler.refresh"
 	token, err := c.Cookie("refresh_token")
 	if err != nil {
 		ResponseError(c, "refresh token not provided", err.Error(), http.StatusUnauthorized)

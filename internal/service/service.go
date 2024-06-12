@@ -92,7 +92,7 @@ func New(repos *repository.Repository, r *rand.Rand) *Service {
 	maintenanceService := NewMaintenanceService(repos.Maintenance, r)
 
 	return &Service{
-		Auth:        NewAuthService(repos.Auth, tokenService, userService),
+		Auth:        NewAuthService(tokenService, userService),
 		User:        userService,
 		Equipment:   equipmentService,
 		Event:       NewEventService(repos.Event, equipmentService),

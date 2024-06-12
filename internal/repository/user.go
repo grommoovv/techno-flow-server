@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
@@ -12,26 +13,59 @@ type UserRepository struct {
 	db *sqlx.DB
 }
 
+var (
+	ErrUserExist    = errors.New("user already exists")
+	ErrUserNotFound = errors.New("user not found")
+)
+
 func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
 func (ur *UserRepository) Create(dto entities.UserCreateDto) (int, error) {
-	var id int
+	const op = "Repository/UserRepository.Create"
+	var userId int
 
-	query := fmt.Sprintf("INSERT INTO %s (username, password) values ($1, $2) RETURNING id", postgres.UsersTable)
-
-	row := ur.db.QueryRow(query, dto.Username, dto.Password)
-	if err := row.Scan(&id); err != nil {
+	trx, err := ur.db.Beginx()
+	if err != nil {
 		return 0, err
 	}
 
-	return id, nil
+	createUserQuery := fmt.Sprintf(`INSERT INTO %s (username, password) values ($1, $2) RETURNING id`, postgres.UsersTable)
+
+	if err = trx.QueryRowx(createUserQuery, dto.Username, dto.Password).Scan(&userId); err != nil {
+		if err = trx.Rollback(); err != nil {
+			return 0, err
+		}
+		return 0, err
+	}
+
+	createUserRoleQuery := fmt.Sprintf(`INSERT INTO %s (user_id) VALUES ($1)`, postgres.UserRolesTable)
+	_, err = trx.Exec(createUserRoleQuery, userId)
+
+	if err != nil {
+		if err = trx.Rollback(); err != nil {
+			return 0, err
+		}
+		return 0, err
+	}
+
+	if err = trx.Commit(); err != nil {
+		return 0, err
+	}
+
+	return userId, nil
 }
 
 func (ur *UserRepository) GetAll() ([]entities.User, error) {
+	const op = "Repository/UserRepository.GetAll"
 	var users []entities.User
-	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.UsersTable)
+	query := fmt.Sprintf(`
+        SELECT u.*, ur.role, ur.access_level
+        FROM %s u
+        LEFT JOIN %s ur ON u.id = ur.user_id
+        ORDER BY u.id ASC`, postgres.UsersTable, postgres.UserRolesTable)
+
 	if err := ur.db.Select(&users, query); err != nil {
 		return nil, err
 	}
@@ -39,26 +73,32 @@ func (ur *UserRepository) GetAll() ([]entities.User, error) {
 }
 
 func (ur *UserRepository) GetById(id int) (entities.User, error) {
+	const op = "Repository/UserRepository.GetById"
 	var user entities.User
+	query := fmt.Sprintf(`
+        SELECT u.*, ur.role, ur.access_level 
+        FROM %s u 
+        LEFT JOIN %s ur ON u.id = ur.user_id 
+        WHERE u.id = $1`, postgres.UsersTable, postgres.UserRolesTable)
 
-	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE id = $1", postgres.UsersTable)
-
-	err := ur.db.QueryRow(query, id).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt)
-
+	err := ur.db.QueryRow(query, id).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt, &user.Role, &user.AccessLevel)
 	return user, err
 }
 
 func (ur *UserRepository) GetByCredentials(userDto entities.UserSignInDto) (entities.User, error) {
+	const op = "Repository/UserRepository.GetByCredentials"
 	var user entities.User
-
-	query := fmt.Sprintf("SELECT id, username, email, fullname, created_at FROM %s WHERE username = $1 AND password = $2", postgres.UsersTable)
-
-	err := ur.db.QueryRow(query, userDto.Username, userDto.Password).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt)
-
+	query := fmt.Sprintf(`
+        SELECT u.id, u.username, u.email, u.fullname, u.created_at, ur.role, ur.access_level
+        FROM %s u
+        LEFT JOIN %s ur ON u.id = ur.user_id 
+        WHERE u.username = $1 AND u.password = $2`, postgres.UsersTable, postgres.UserRolesTable)
+	err := ur.db.QueryRow(query, userDto.Username, userDto.Password).Scan(&user.Id, &user.Username, &user.Email, &user.FullName, &user.CreatedAt, &user.Role, &user.AccessLevel)
 	return user, err
 }
 
 func (ur *UserRepository) Delete(id int) (int, error) {
+	const op = "Repository/UserRepository.Delete"
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.UsersTable)
 	if _, err := ur.db.Exec(query, id); err != nil {
 		return 0, err
@@ -68,6 +108,7 @@ func (ur *UserRepository) Delete(id int) (int, error) {
 }
 
 func (ur *UserRepository) Update(id int, userDto entities.UserUpdateDto) error {
+	const op = "Repository/UserRepository.Update"
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1

@@ -6,11 +6,6 @@ import (
 )
 
 type (
-	Auth interface {
-		SignIn()
-		SignOut()
-	}
-
 	User interface {
 		GetAll() ([]entities.User, error)
 		GetById(id int) (entities.User, error)
@@ -63,16 +58,15 @@ type (
 	}
 
 	Token interface {
-		GetTokenByUserId(userId int) (entities.Token, error)
-		FindRefreshToken(refreshToken string) (entities.Token, error)
-		SaveRefreshToken(userId int, refreshToken string) (int, error)
-		UpdateToken(userId int, refreshToken string) error
-		DeleteToken(refreshToken string) error
+		GetByUserId(userId int) (entities.Token, error)
+		Find(refreshToken string) (entities.Token, error)
+		Save(userId int, refreshToken string) (int, error)
+		Update(userId int, refreshToken string) error
+		Delete(refreshToken string) error
 	}
 
 	Repository struct {
 		User
-		Auth
 		Equipment
 		Event
 		Report
@@ -84,7 +78,6 @@ type (
 func New(db *sqlx.DB) *Repository {
 	return &Repository{
 		User:        NewUserRepository(db),
-		Auth:        NewAuthRepository(db),
 		Equipment:   NewEquipmentRepository(db),
 		Event:       NewEventRepository(db),
 		Report:      NewReportRepository(db),

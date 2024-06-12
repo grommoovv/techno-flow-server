@@ -15,7 +15,7 @@ func NewTokenRepository(db *sqlx.DB) *TokenRepository {
 	return &TokenRepository{db: db}
 }
 
-func (tr *TokenRepository) GetTokenByUserId(userId int) (entities.Token, error) {
+func (tr *TokenRepository) GetByUserId(userId int) (entities.Token, error) {
 	var token entities.Token
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postgres.TokensTable)
@@ -25,7 +25,7 @@ func (tr *TokenRepository) GetTokenByUserId(userId int) (entities.Token, error) 
 	return token, err
 }
 
-func (tr *TokenRepository) FindRefreshToken(refreshToken string) (entities.Token, error) {
+func (tr *TokenRepository) Find(refreshToken string) (entities.Token, error) {
 	var token entities.Token
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE refresh_token = $1", postgres.TokensTable)
@@ -35,7 +35,7 @@ func (tr *TokenRepository) FindRefreshToken(refreshToken string) (entities.Token
 	return token, err
 }
 
-func (tr *TokenRepository) SaveRefreshToken(userId int, refreshToken string) (int, error) {
+func (tr *TokenRepository) Save(userId int, refreshToken string) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (refresh_token, user_id) values ($1, $2) RETURNING id", postgres.TokensTable)
@@ -48,14 +48,14 @@ func (tr *TokenRepository) SaveRefreshToken(userId int, refreshToken string) (in
 	return id, nil
 }
 
-func (tr *TokenRepository) UpdateToken(userId int, refreshToken string) error {
+func (tr *TokenRepository) Update(userId int, refreshToken string) error {
 	query := fmt.Sprintf("UPDATE %s SET refresh_token = $1 WHERE user_id = $2", postgres.TokensTable)
 	_, err := tr.db.Exec(query, refreshToken, userId)
 
 	return err
 }
 
-func (tr *TokenRepository) DeleteToken(refreshToken string) error {
+func (tr *TokenRepository) Delete(refreshToken string) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE refresh_token = $1", postgres.TokensTable)
 	if _, err := tr.db.Exec(query, refreshToken); err != nil {
 		return err

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"server-techno-flow/internal/entities"
-	"server-techno-flow/internal/repository"
 	"time"
 )
 
@@ -22,13 +21,12 @@ type tokenClaims struct {
 }
 
 type AuthService struct {
-	repo         repository.Auth
 	tokenService TokenService
 	userService  UserService
 }
 
-func NewAuthService(repo repository.Auth, tokenService *TokenService, userService *UserService) *AuthService {
-	return &AuthService{repo: repo, tokenService: *tokenService, userService: *userService}
+func NewAuthService(tokenService *TokenService, userService *UserService) *AuthService {
+	return &AuthService{tokenService: *tokenService, userService: *userService}
 }
 
 func (as *AuthService) SignIn(credentials entities.UserSignInDto) (entities.User, string, string, error) {

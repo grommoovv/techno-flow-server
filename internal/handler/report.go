@@ -8,6 +8,7 @@ import (
 )
 
 func (h *Handler) CreateReport(c *gin.Context) {
+	const op = "report/Handler.CreateReport"
 	var reportDto entities.ReportCreateDto
 
 	if err := c.BindJSON(&reportDto); err != nil {
@@ -26,6 +27,7 @@ func (h *Handler) CreateReport(c *gin.Context) {
 }
 
 func (h *Handler) GetAllReports(c *gin.Context) {
+	const op = "report/Handler.GetAllReports"
 	reports, err := h.services.Report.GetAllReports()
 
 	if err != nil {
@@ -37,6 +39,7 @@ func (h *Handler) GetAllReports(c *gin.Context) {
 }
 
 func (h *Handler) GetReportById(c *gin.Context) {
+	const op = "report/Handler.GetReportById"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -56,6 +59,7 @@ func (h *Handler) GetReportById(c *gin.Context) {
 }
 
 func (h *Handler) GetReportsByUserId(c *gin.Context) {
+	const op = "report/Handler.GetReportsByUserId"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -75,6 +79,7 @@ func (h *Handler) GetReportsByUserId(c *gin.Context) {
 }
 
 func (h *Handler) DeleteReport(c *gin.Context) {
+	const op = "report/Handler.DeleteReport"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)

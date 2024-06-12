@@ -94,11 +94,11 @@ func (ts *TokenService) ParseAccessToken(accessToken string) (int, error) {
 }
 
 func (ts *TokenService) GetTokenByUserId(userId int) (entities.Token, error) {
-	return ts.repo.GetTokenByUserId(userId)
+	return ts.repo.GetByUserId(userId)
 }
 
 func (ts *TokenService) FindRefreshToken(refreshToken string) (entities.Token, error) {
-	return ts.repo.FindRefreshToken(refreshToken)
+	return ts.repo.Find(refreshToken)
 }
 
 func (ts *TokenService) SaveRefreshToken(userId int, refreshToken string) (int, error) {
@@ -113,7 +113,7 @@ func (ts *TokenService) SaveRefreshToken(userId int, refreshToken string) (int, 
 	if err == sql.ErrNoRows {
 		// Первый раз генерируем токен
 		fmt.Printf("Первый раз генерируем токен? ошибкa: %s", err.Error())
-		return ts.repo.SaveRefreshToken(userId, refreshToken)
+		return ts.repo.Save(userId, refreshToken)
 	}
 
 	// Если токен уже есть, обновляем его
@@ -121,10 +121,9 @@ func (ts *TokenService) SaveRefreshToken(userId int, refreshToken string) (int, 
 }
 
 func (ts *TokenService) UpdateRefreshToken(userId int, refreshToken string) error {
-	fmt.Printf("UpdateToken?")
-	return ts.repo.UpdateToken(userId, refreshToken)
+	return ts.repo.Update(userId, refreshToken)
 }
 
 func (ts *TokenService) DeleteRefreshToken(refreshToken string) error {
-	return ts.repo.DeleteToken(refreshToken)
+	return ts.repo.Delete(refreshToken)
 }

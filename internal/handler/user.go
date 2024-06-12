@@ -8,6 +8,7 @@ import (
 )
 
 func (h *Handler) CreateUser(c *gin.Context) {
+	const op = "user/Handler.CreateUser"
 	var userDto entities.UserCreateDto
 
 	if err := c.BindJSON(&userDto); err != nil {
@@ -26,6 +27,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 }
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
+	const op = "user/Handler.GetAllUsers"
 	users, err := h.services.User.GetAllUsers()
 
 	if err != nil {
@@ -37,6 +39,7 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 }
 
 func (h *Handler) GetUserById(c *gin.Context) {
+	const op = "user/Handler.GetUserById"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -56,6 +59,7 @@ func (h *Handler) GetUserById(c *gin.Context) {
 }
 
 func (h *Handler) DeleteUser(c *gin.Context) {
+	const op = "user/Handler.DeleteUser"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -74,6 +78,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 }
 
 func (h *Handler) UpdateUser(c *gin.Context) {
+	const op = "user/Handler.UpdateUser"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)

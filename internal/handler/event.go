@@ -8,6 +8,7 @@ import (
 )
 
 func (h *Handler) CreateEvent(c *gin.Context) {
+	const op = "event/Handler.CreateEvent"
 	var eventDto entities.EventCreateDto
 
 	if err := c.BindJSON(&eventDto); err != nil {
@@ -26,6 +27,7 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 }
 
 func (h *Handler) GetAllEvents(c *gin.Context) {
+	const op = "event/Handler.GetAllEvents"
 	events, err := h.services.Event.GetAllEvents()
 
 	if err != nil {
@@ -37,6 +39,7 @@ func (h *Handler) GetAllEvents(c *gin.Context) {
 }
 
 func (h *Handler) GetEventById(c *gin.Context) {
+	const op = "event/Handler.GetEventById"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -56,6 +59,7 @@ func (h *Handler) GetEventById(c *gin.Context) {
 }
 
 func (h *Handler) GetEventsByUserId(c *gin.Context) {
+	const op = "event/Handler.GetEventsByUserId"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -75,6 +79,7 @@ func (h *Handler) GetEventsByUserId(c *gin.Context) {
 }
 
 func (h *Handler) DeleteEvent(c *gin.Context) {
+	const op = "event/Handler.DeleteEvent"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)

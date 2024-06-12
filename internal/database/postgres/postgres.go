@@ -14,6 +14,8 @@ const (
 	ReportsTable        = "reports"
 	MaintenanceTable    = "maintenance"
 	TokensTable         = "tokens"
+	RolesTable          = "roles"
+	UserRolesTable      = "user_roles"
 )
 
 type Postgres struct {

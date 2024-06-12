@@ -9,6 +9,7 @@ import (
 func (h *Handler) CreateMaintenance(c *gin.Context) {}
 
 func (h *Handler) GetAllMaintenance(c *gin.Context) {
+	const op = "maintenance/Handler.GetAllMaintenance"
 	maintenance, err := h.services.Maintenance.GetAll()
 
 	if err != nil {
@@ -20,6 +21,7 @@ func (h *Handler) GetAllMaintenance(c *gin.Context) {
 }
 
 func (h *Handler) GetMaintenanceById(c *gin.Context) {
+	const op = "maintenance/Handler.GetMaintenanceById"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)

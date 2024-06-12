@@ -8,6 +8,7 @@ import (
 )
 
 func (h *Handler) CreateEquipment(c *gin.Context) {
+	const op = "equipment/Handler.CreateEquipment"
 	var equipmentDto entities.EquipmentCreateDto
 
 	if err := c.BindJSON(&equipmentDto); err != nil {
@@ -26,6 +27,7 @@ func (h *Handler) CreateEquipment(c *gin.Context) {
 }
 
 func (h *Handler) GetAllEquipment(c *gin.Context) {
+	const op = "equipment/Handler.GetAllEquipment"
 	equipment, err := h.services.Equipment.GetAllEquipment()
 
 	if err != nil {
@@ -37,7 +39,7 @@ func (h *Handler) GetAllEquipment(c *gin.Context) {
 }
 
 func (h *Handler) GetAvailableEquipmentByDate(c *gin.Context) {
-
+	const op = "equipment/Handler.GetAvailableEquipmentByDate"
 	var dto entities.GetAvailableEquipmentByDateDto
 
 	if err := c.BindJSON(&dto); err != nil {
@@ -61,6 +63,7 @@ func (h *Handler) GetAvailableEquipmentByDate(c *gin.Context) {
 }
 
 func (h *Handler) GetEquipmentById(c *gin.Context) {
+	const op = "equipment/Handler.GetEquipmentById"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -80,6 +83,7 @@ func (h *Handler) GetEquipmentById(c *gin.Context) {
 }
 
 func (h *Handler) GetEquipmentByEventId(c *gin.Context) {
+	const op = "equipment/Handler.GetEquipmentByEventId"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -99,6 +103,7 @@ func (h *Handler) GetEquipmentByEventId(c *gin.Context) {
 }
 
 func (h *Handler) GetEquipmentUsageHistoryById(c *gin.Context) {
+	const op = "equipment/Handler.GetEquipmentUsageHistoryById"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -118,6 +123,7 @@ func (h *Handler) GetEquipmentUsageHistoryById(c *gin.Context) {
 }
 
 func (h *Handler) DeleteEquipment(c *gin.Context) {
+	const op = "equipment/Handler.DeleteEquipment"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
@@ -136,6 +142,7 @@ func (h *Handler) DeleteEquipment(c *gin.Context) {
 }
 
 func (h *Handler) UpdateEquipment(c *gin.Context) {
+	const op = "equipment/Handler.UpdateEquipment"
 	paramId := c.Param("id")
 
 	id, err := strconv.Atoi(paramId)
