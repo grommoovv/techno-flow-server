@@ -16,7 +16,7 @@ func (h *Handler) CreateEquipment(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.Equipment.CreateEquipment(equipmentDto)
+	id, err := h.services.Equipment.CreateEquipment(c, equipmentDto)
 
 	if err != nil {
 		ResponseError(c, "failed to create equipment", err.Error(), http.StatusInternalServerError)
@@ -28,7 +28,7 @@ func (h *Handler) CreateEquipment(c *gin.Context) {
 
 func (h *Handler) GetAllEquipment(c *gin.Context) {
 	const op = "equipment/Handler.GetAllEquipment"
-	equipment, err := h.services.Equipment.GetAllEquipment()
+	equipment, err := h.services.Equipment.GetAllEquipment(c)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch equipment", err.Error(), http.StatusInternalServerError)
@@ -47,7 +47,7 @@ func (h *Handler) GetAvailableEquipmentByDate(c *gin.Context) {
 		return
 	}
 
-	equipment, err := h.services.Equipment.GetAvailableEquipmentByDate(dto)
+	equipment, err := h.services.Equipment.GetAvailableEquipmentByDate(c, dto)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch available equipment", err.Error(), http.StatusInternalServerError)
@@ -72,7 +72,7 @@ func (h *Handler) GetEquipmentById(c *gin.Context) {
 		return
 	}
 
-	equipment, err := h.services.Equipment.GetEquipmentById(id)
+	equipment, err := h.services.Equipment.GetEquipmentById(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch equipment", err.Error(), http.StatusInternalServerError)
@@ -92,7 +92,7 @@ func (h *Handler) GetEquipmentByEventId(c *gin.Context) {
 		return
 	}
 
-	equipment, err := h.services.Equipment.GetEquipmentByEventId(id)
+	equipment, err := h.services.Equipment.GetEquipmentByEventId(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch equipment", err.Error(), http.StatusInternalServerError)
@@ -112,7 +112,7 @@ func (h *Handler) GetEquipmentUsageHistoryById(c *gin.Context) {
 		return
 	}
 
-	history, err := h.services.Equipment.GetEquipmentUsageHistoryById(id)
+	history, err := h.services.Equipment.GetEquipmentUsageHistoryById(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch equipment reservation dates", err.Error(), http.StatusInternalServerError)
@@ -132,7 +132,7 @@ func (h *Handler) DeleteEquipment(c *gin.Context) {
 		return
 	}
 
-	_, err = h.services.Equipment.DeleteEquipment(id)
+	_, err = h.services.Equipment.DeleteEquipment(c, id)
 	if err != nil {
 		ResponseError(c, "failed to delete equipment", err.Error(), http.StatusInternalServerError)
 		return
@@ -158,7 +158,7 @@ func (h *Handler) UpdateEquipment(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Equipment.UpdateEquipment(id, equipmentUpdateDto)
+	err = h.services.Equipment.UpdateEquipment(c, id, equipmentUpdateDto)
 
 	if err != nil {
 		ResponseError(c, "failed to update equipment", err.Error(), http.StatusInternalServerError)

@@ -16,7 +16,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.User.CreateUser(userDto)
+	id, err := h.services.User.CreateUser(c, userDto)
 
 	if err != nil {
 		ResponseError(c, "failed to create user", err.Error(), http.StatusInternalServerError)
@@ -28,7 +28,7 @@ func (h *Handler) CreateUser(c *gin.Context) {
 
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	const op = "user/Handler.GetAllUsers"
-	users, err := h.services.User.GetAllUsers()
+	users, err := h.services.User.GetAllUsers(c)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch users", err.Error(), http.StatusInternalServerError)
@@ -48,7 +48,7 @@ func (h *Handler) GetUserById(c *gin.Context) {
 		return
 	}
 
-	user, err := h.services.User.GetUserById(id)
+	user, err := h.services.User.GetUserById(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch user", err.Error(), http.StatusInternalServerError)
@@ -68,7 +68,7 @@ func (h *Handler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	_, err = h.services.User.DeleteUser(id)
+	_, err = h.services.User.DeleteUser(c, id)
 	if err != nil {
 		ResponseError(c, "failed to delete user", err.Error(), http.StatusInternalServerError)
 		return
@@ -94,7 +94,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	err = h.services.User.UpdateUser(id, userUpdateDto)
+	err = h.services.User.UpdateUser(c, id, userUpdateDto)
 
 	if err != nil {
 		ResponseError(c, "failed to update user", err.Error(), http.StatusInternalServerError)

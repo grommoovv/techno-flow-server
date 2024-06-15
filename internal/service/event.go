@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
 )
@@ -14,7 +15,7 @@ func NewEventService(repo repository.Event, equipmentService *EquipmentService) 
 	return &EventService{repo: repo, EquipmentService: *equipmentService}
 }
 
-func (es *EventService) CreateEvent(dto entities.EventCreateDto) (int, error) {
+func (es *EventService) CreateEvent(ctx context.Context, dto entities.EventCreateDto) (int, error) {
 	//var updateEquipmentDto entities.EquipmentUpdateDto
 	//updateEquipmentDto.ReservedAt = &dto.StartDate
 	//
@@ -24,24 +25,24 @@ func (es *EventService) CreateEvent(dto entities.EventCreateDto) (int, error) {
 	//	}
 	//}
 
-	eventID, err := es.repo.Create(dto)
+	eventID, err := es.repo.Create(ctx, dto)
 
 	return eventID, err
 }
 
-func (es *EventService) GetAllEvents() ([]entities.Event, error) {
-	return es.repo.GetAll()
+func (es *EventService) GetAllEvents(ctx context.Context) ([]entities.Event, error) {
+	return es.repo.GetAll(ctx)
 }
 
-func (es *EventService) GetEventById(id int) (entities.Event, error) {
-	return es.repo.GetById(id)
+func (es *EventService) GetEventById(ctx context.Context, id int) (entities.Event, error) {
+	return es.repo.GetById(ctx, id)
 }
 
-func (es *EventService) GetEventsByUserId(id int) ([]entities.Event, error) {
-	return es.repo.GetByUserId(id)
+func (es *EventService) GetEventsByUserId(ctx context.Context, id int) ([]entities.Event, error) {
+	return es.repo.GetByUserId(ctx, id)
 }
 
-func (es *EventService) DeleteEvent(id int) error {
+func (es *EventService) DeleteEvent(ctx context.Context, id int) error {
 	//var updateEquipmentDto entities.EquipmentUpdateDto
 	//updateEquipmentDto.ReservedAt = &dto.StartDate
 	//
@@ -51,9 +52,9 @@ func (es *EventService) DeleteEvent(id int) error {
 	//	}
 	//}
 
-	err := es.repo.Delete(id)
+	err := es.repo.Delete(ctx, id)
 
 	return err
 }
 
-func (es *EventService) UpdateEvent() {}
+func (es *EventService) UpdateEvent(ctx context.Context) {}

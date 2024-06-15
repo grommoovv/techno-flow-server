@@ -1,68 +1,69 @@
 package repository
 
 import (
+	"context"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/entities"
 )
 
 type (
 	User interface {
-		GetAll() ([]entities.User, error)
-		GetById(id int) (entities.User, error)
-		GetByCredentials(dto entities.UserSignInDto) (entities.User, error)
+		GetAll(ctx context.Context) ([]entities.User, error)
+		GetById(ctx context.Context, id int) (entities.User, error)
+		GetByCredentials(ctx context.Context, dto entities.UserSignInDto) (entities.User, error)
 
-		Create(dto entities.UserCreateDto) (int, error)
-		Delete(id int) (int, error)
-		Update(id int, dto entities.UserUpdateDto) error
+		Create(ctx context.Context, dto entities.UserCreateDto) (int, error)
+		Delete(ctx context.Context, id int) (int, error)
+		Update(ctx context.Context, id int, dto entities.UserUpdateDto) error
 	}
 
 	Equipment interface {
-		GetAll() ([]entities.Equipment, error)
-		GetAvailableByDate(dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error)
-		GetById(id int) (entities.Equipment, error)
-		GetByEventId(id int) ([]entities.Equipment, error)
-		GetUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error)
+		GetAll(ctx context.Context) ([]entities.Equipment, error)
+		GetAvailableByDate(ctx context.Context, dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error)
+		GetById(ctx context.Context, id int) (entities.Equipment, error)
+		GetByEventId(ctx context.Context, id int) ([]entities.Equipment, error)
+		GetUsageHistoryById(ctx context.Context, id int) ([]entities.EquipmentUsageHistory, error)
 
-		Create(dto entities.EquipmentCreateDto) (int, error)
-		Delete(id int) (int, error)
-		Update(id int, dto entities.EquipmentUpdateDto) error
+		Create(ctx context.Context, dto entities.EquipmentCreateDto) (int, error)
+		Delete(ctx context.Context, id int) (int, error)
+		Update(ctx context.Context, id int, dto entities.EquipmentUpdateDto) error
 	}
 
 	Event interface {
-		GetAll() ([]entities.Event, error)
-		GetById(id int) (entities.Event, error)
-		GetByUserId(id int) ([]entities.Event, error)
+		GetAll(ctx context.Context) ([]entities.Event, error)
+		GetById(ctx context.Context, id int) (entities.Event, error)
+		GetByUserId(ctx context.Context, id int) ([]entities.Event, error)
 
-		Create(dto entities.EventCreateDto) (int, error)
-		Delete(id int) error
-		Update()
+		Create(ctx context.Context, dto entities.EventCreateDto) (int, error)
+		Delete(ctx context.Context, id int) error
+		Update(ctx context.Context)
 	}
 
 	Report interface {
-		GetAll() ([]entities.Report, error)
-		GetById(id int) (entities.Report, error)
-		GetByUserId(id int) ([]entities.Report, error)
+		GetAll(ctx context.Context) ([]entities.Report, error)
+		GetById(ctx context.Context, id int) (entities.Report, error)
+		GetByUserId(ctx context.Context, id int) ([]entities.Report, error)
 
-		Create(dto entities.ReportCreateDto) (int, error)
-		Delete(id int) error
-		Update()
+		Create(ctx context.Context, dto entities.ReportCreateDto) (int, error)
+		Delete(ctx context.Context, id int) error
+		Update(ctx context.Context)
 	}
 
 	Maintenance interface {
-		GetAll() ([]entities.Maintenance, error)
-		GetById(id int) (entities.Maintenance, error)
+		GetAll(ctx context.Context) ([]entities.Maintenance, error)
+		GetById(ctx context.Context, id int) (entities.Maintenance, error)
 
-		Create(dto entities.MaintenanceCreateDto) (int, error)
-		Delete(id int) error
-		Update()
+		Create(ctx context.Context, dto entities.MaintenanceCreateDto) (int, error)
+		Delete(ctx context.Context, id int) error
+		Update(ctx context.Context)
 	}
 
 	Token interface {
-		GetByUserId(userId int) (entities.Token, error)
-		Find(refreshToken string) (entities.Token, error)
-		Save(userId int, refreshToken string) (int, error)
-		Update(userId int, refreshToken string) error
-		Delete(refreshToken string) error
+		GetByUserId(ctx context.Context, userId int) (entities.Token, error)
+		Find(ctx context.Context, refreshToken string) (entities.Token, error)
+		Save(ctx context.Context, userId int, refreshToken string) (int, error)
+		Update(ctx context.Context, userId int, refreshToken string) error
+		Delete(ctx context.Context, refreshToken string) error
 	}
 
 	Repository struct {

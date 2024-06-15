@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -25,7 +26,7 @@ func NewTokenService(repo repository.Token) *TokenService {
 	return &TokenService{repo: repo}
 }
 
-func (ts *TokenService) NewRefreshToken(userId int, username string) (string, error) {
+func (ts *TokenService) NewRefreshToken(ctx context.Context, userId int, username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(REFRESH_TOKEN_TTL).Unix(),
@@ -37,7 +38,7 @@ func (ts *TokenService) NewRefreshToken(userId int, username string) (string, er
 	return token.SignedString([]byte(JWT_REFRESH_SECRET))
 }
 
-func (ts *TokenService) NewAccessToken(userId int, username string) (string, error) {
+func (ts *TokenService) NewAccessToken(ctx context.Context, userId int, username string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(ACCESS_TOKEN_TTL).Unix(),
@@ -49,7 +50,7 @@ func (ts *TokenService) NewAccessToken(userId int, username string) (string, err
 	return token.SignedString([]byte(JWT_ACCESS_SECRET))
 }
 
-func (ts *TokenService) ParseRefreshToken(accessToken string) (int, error) {
+func (ts *TokenService) ParseRefreshToken(ctx context.Context, accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -71,7 +72,7 @@ func (ts *TokenService) ParseRefreshToken(accessToken string) (int, error) {
 	return claims.UserId, nil
 }
 
-func (ts *TokenService) ParseAccessToken(accessToken string) (int, error) {
+func (ts *TokenService) ParseAccessToken(ctx context.Context, accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -93,16 +94,16 @@ func (ts *TokenService) ParseAccessToken(accessToken string) (int, error) {
 	return claims.UserId, nil
 }
 
-func (ts *TokenService) GetTokenByUserId(userId int) (entities.Token, error) {
-	return ts.repo.GetByUserId(userId)
+func (ts *TokenService) GetTokenByUserId(ctx context.Context, userId int) (entities.Token, error) {
+	return ts.repo.GetByUserId(ctx, userId)
 }
 
-func (ts *TokenService) FindRefreshToken(refreshToken string) (entities.Token, error) {
-	return ts.repo.Find(refreshToken)
+func (ts *TokenService) FindRefreshToken(ctx context.Context, refreshToken string) (entities.Token, error) {
+	return ts.repo.Find(ctx, refreshToken)
 }
 
-func (ts *TokenService) SaveRefreshToken(userId int, refreshToken string) (int, error) {
-	_, err := ts.GetTokenByUserId(userId)
+func (ts *TokenService) SaveRefreshToken(ctx context.Context, userId int, refreshToken string) (int, error) {
+	_, err := ts.GetTokenByUserId(ctx, userId)
 
 	// Если есть ошибка и это не ошибка "не найдено", то вернуть ошибку
 	if err != nil && err != sql.ErrNoRows {
@@ -113,17 +114,17 @@ func (ts *TokenService) SaveRefreshToken(userId int, refreshToken string) (int, 
 	if err == sql.ErrNoRows {
 		// Первый раз генерируем токен
 		fmt.Printf("Первый раз генерируем токен? ошибкa: %s", err.Error())
-		return ts.repo.Save(userId, refreshToken)
+		return ts.repo.Save(ctx, userId, refreshToken)
 	}
 
 	// Если токен уже есть, обновляем его
-	return 0, ts.UpdateRefreshToken(userId, refreshToken)
+	return 0, ts.UpdateRefreshToken(ctx, userId, refreshToken)
 }
 
-func (ts *TokenService) UpdateRefreshToken(userId int, refreshToken string) error {
-	return ts.repo.Update(userId, refreshToken)
+func (ts *TokenService) UpdateRefreshToken(ctx context.Context, userId int, refreshToken string) error {
+	return ts.repo.Update(ctx, userId, refreshToken)
 }
 
-func (ts *TokenService) DeleteRefreshToken(refreshToken string) error {
-	return ts.repo.Delete(refreshToken)
+func (ts *TokenService) DeleteRefreshToken(ctx context.Context, refreshToken string) error {
+	return ts.repo.Delete(ctx, refreshToken)
 }

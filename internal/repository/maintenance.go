@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
@@ -15,7 +16,7 @@ func NewMaintenanceRepository(db *sqlx.DB) *MaintenanceRepository {
 	return &MaintenanceRepository{db: db}
 }
 
-func (mr *MaintenanceRepository) Create(dto entities.MaintenanceCreateDto) (int, error) {
+func (mr *MaintenanceRepository) Create(ctx context.Context, dto entities.MaintenanceCreateDto) (int, error) {
 	var maintenanceID int
 
 	query := fmt.Sprintf("INSERT INTO %s (equipment_id, fixed_in) values ($1, $2) RETURNING id", postgres.MaintenanceTable)
@@ -28,7 +29,7 @@ func (mr *MaintenanceRepository) Create(dto entities.MaintenanceCreateDto) (int,
 	return maintenanceID, nil
 }
 
-func (mr *MaintenanceRepository) GetAll() ([]entities.Maintenance, error) {
+func (mr *MaintenanceRepository) GetAll(ctx context.Context) ([]entities.Maintenance, error) {
 	var maintenance []entities.Maintenance
 
 	query := fmt.Sprintf(`
@@ -45,7 +46,7 @@ func (mr *MaintenanceRepository) GetAll() ([]entities.Maintenance, error) {
 	return maintenance, nil
 }
 
-func (mr *MaintenanceRepository) GetById(id int) (entities.Maintenance, error) {
+func (mr *MaintenanceRepository) GetById(ctx context.Context, id int) (entities.Maintenance, error) {
 	var maintenance entities.Maintenance
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", postgres.MaintenanceTable)
@@ -55,7 +56,7 @@ func (mr *MaintenanceRepository) GetById(id int) (entities.Maintenance, error) {
 	return maintenance, err
 }
 
-func (mr *MaintenanceRepository) Delete(id int) error {
+func (mr *MaintenanceRepository) Delete(ctx context.Context, id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.MaintenanceTable)
 	if _, err := mr.db.Exec(query, id); err != nil {
 		return err
@@ -64,4 +65,4 @@ func (mr *MaintenanceRepository) Delete(id int) error {
 	return nil
 }
 
-func (mr *MaintenanceRepository) Update() {}
+func (mr *MaintenanceRepository) Update(ctx context.Context) {}

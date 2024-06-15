@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
@@ -15,7 +16,7 @@ func NewEventRepository(db *sqlx.DB) *EventRepository {
 	return &EventRepository{db: db}
 }
 
-func (er *EventRepository) Create(dto entities.EventCreateDto) (int, error) {
+func (er *EventRepository) Create(ctx context.Context, dto entities.EventCreateDto) (int, error) {
 	var eventID int
 
 	for _, equipmentID := range dto.EquipmentIDs {
@@ -51,7 +52,7 @@ func (er *EventRepository) Create(dto entities.EventCreateDto) (int, error) {
 	return eventID, nil
 }
 
-func (er *EventRepository) GetAll() ([]entities.Event, error) {
+func (er *EventRepository) GetAll(ctx context.Context) ([]entities.Event, error) {
 	var events []entities.Event
 	query := fmt.Sprintf("SELECT e.id, e.title, e.type, e.start_date, e.end_date,  e.duration, e.status, e.user_id, u.username FROM %s e JOIN %s u on e.user_id = u.id ORDER BY e.start_date ASC", postgres.EventsTable, postgres.UsersTable)
 	if err := er.db.Select(&events, query); err != nil {
@@ -60,7 +61,7 @@ func (er *EventRepository) GetAll() ([]entities.Event, error) {
 	return events, nil
 }
 
-func (er *EventRepository) GetById(id int) (entities.Event, error) {
+func (er *EventRepository) GetById(ctx context.Context, id int) (entities.Event, error) {
 	var event entities.Event
 
 	query := fmt.Sprintf(`
@@ -75,7 +76,7 @@ func (er *EventRepository) GetById(id int) (entities.Event, error) {
 	return event, err
 }
 
-func (er *EventRepository) GetByUserId(id int) ([]entities.Event, error) {
+func (er *EventRepository) GetByUserId(ctx context.Context, id int) ([]entities.Event, error) {
 	var events []entities.Event
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postgres.EventsTable)
@@ -87,7 +88,7 @@ func (er *EventRepository) GetByUserId(id int) ([]entities.Event, error) {
 	return events, nil
 }
 
-func (er *EventRepository) Delete(id int) error {
+func (er *EventRepository) Delete(ctx context.Context, id int) error {
 
 	query := fmt.Sprintf("SELECT equipment_id FROM %s WHERE event_id=$1", postgres.EquipmentUsageTable)
 	rows, err := er.db.Query(query, id)
@@ -122,4 +123,4 @@ func (er *EventRepository) Delete(id int) error {
 	return nil
 }
 
-func (er *EventRepository) Update() {}
+func (er *EventRepository) Update(ctx context.Context) {}

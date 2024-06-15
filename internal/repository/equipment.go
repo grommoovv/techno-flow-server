@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"server-techno-flow/internal/database/postgres"
 	"server-techno-flow/internal/entities"
@@ -17,7 +18,7 @@ func NewEquipmentRepository(db *sqlx.DB) *EquipmentRepository {
 	return &EquipmentRepository{db: db}
 }
 
-func (er *EquipmentRepository) Create(dto entities.EquipmentCreateDto) (int, error) {
+func (er *EquipmentRepository) Create(ctx context.Context, dto entities.EquipmentCreateDto) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (title, status) values ($1, $2) RETURNING id", postgres.EquipmentTable)
@@ -30,7 +31,7 @@ func (er *EquipmentRepository) Create(dto entities.EquipmentCreateDto) (int, err
 	return id, nil
 }
 
-func (er *EquipmentRepository) GetAll() ([]entities.Equipment, error) {
+func (er *EquipmentRepository) GetAll(ctx context.Context) ([]entities.Equipment, error) {
 	var equipment []entities.Equipment
 
 	query := fmt.Sprintf("SELECT e.id, e.title, e.status, e.created_at, CASE WHEN eu.equipment_id IS NULL AND r.equipment_id IS NULL THEN true ELSE false END AS is_available FROM %s e LEFT JOIN %s eu ON e.id = eu.equipment_id AND current_date BETWEEN eu.start_date AND eu.end_date LEFT JOIN %s r ON e.id = r.equipment_id ORDER BY e.id ASC", postgres.EquipmentTable, postgres.EquipmentUsageTable, postgres.ReportsTable)
@@ -41,7 +42,7 @@ func (er *EquipmentRepository) GetAll() ([]entities.Equipment, error) {
 	return equipment, nil
 }
 
-func (er *EquipmentRepository) GetAvailableByDate(dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error) {
+func (er *EquipmentRepository) GetAvailableByDate(ctx context.Context, dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error) {
 	var equipment []entities.Equipment
 
 	fmt.Printf("start_date: %v\n end_date: %v\n", dto.StartDate, dto.EndDate)
@@ -72,7 +73,7 @@ func (er *EquipmentRepository) GetAvailableByDate(dto entities.GetAvailableEquip
 	return equipment, nil
 }
 
-func (er *EquipmentRepository) GetById(id int) (entities.Equipment, error) {
+func (er *EquipmentRepository) GetById(ctx context.Context, id int) (entities.Equipment, error) {
 	var equipment entities.Equipment
 
 	query := fmt.Sprintf("SELECT e.id, e.title, e.status, e.created_at,  CASE WHEN eu.equipment_id IS NULL AND r.equipment_id IS NULL THEN true ELSE false END AS is_available FROM %s e LEFT JOIN %s eu ON e.id = eu.equipment_id AND CURRENT_DATE BETWEEN eu.start_date AND eu.end_date LEFT JOIN %s r ON e.id = r.equipment_id WHERE e.id = $1", postgres.EquipmentTable, postgres.EquipmentUsageTable, postgres.ReportsTable)
@@ -82,7 +83,7 @@ func (er *EquipmentRepository) GetById(id int) (entities.Equipment, error) {
 	return equipment, err
 }
 
-func (er *EquipmentRepository) GetByEventId(eventID int) ([]entities.Equipment, error) {
+func (er *EquipmentRepository) GetByEventId(ctx context.Context, eventID int) ([]entities.Equipment, error) {
 	var equipment []entities.Equipment
 
 	query := fmt.Sprintf(`
@@ -98,7 +99,7 @@ func (er *EquipmentRepository) GetByEventId(eventID int) ([]entities.Equipment, 
 	return equipment, nil
 }
 
-func (er *EquipmentRepository) GetUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error) {
+func (er *EquipmentRepository) GetUsageHistoryById(ctx context.Context, id int) ([]entities.EquipmentUsageHistory, error) {
 	dates := make([]entities.EquipmentUsageHistory, 0)
 
 	query := fmt.Sprintf("SELECT eu.id, u.username AS username, e.title AS event_title, eu.start_date, eu.end_date FROM %s eu JOIN users u ON u.id = eu.user_id JOIN events e ON e.id = eu.event_id WHERE eu.equipment_id = $1 ORDER BY eu.start_date ASC", postgres.EquipmentUsageTable)
@@ -110,7 +111,7 @@ func (er *EquipmentRepository) GetUsageHistoryById(id int) ([]entities.Equipment
 	return dates, nil
 }
 
-func (er *EquipmentRepository) GetEquipmentIsAvailableNow(id int) (bool, error) {
+func (er *EquipmentRepository) GetEquipmentIsAvailableNow(ctx context.Context, id int) (bool, error) {
 	var count int
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE equipment_id = $1 AND current_date BETWEEN start_date AND end_date", postgres.EquipmentUsageTable)
 
@@ -122,7 +123,7 @@ func (er *EquipmentRepository) GetEquipmentIsAvailableNow(id int) (bool, error) 
 	return count == 0, nil
 }
 
-func (er *EquipmentRepository) Delete(id int) (int, error) {
+func (er *EquipmentRepository) Delete(ctx context.Context, id int) (int, error) {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.EquipmentTable)
 	if _, err := er.db.Exec(query, id); err != nil {
 		return 0, err
@@ -131,7 +132,7 @@ func (er *EquipmentRepository) Delete(id int) (int, error) {
 	return id, nil
 }
 
-func (er *EquipmentRepository) Update(id int, dto entities.EquipmentUpdateDto) error {
+func (er *EquipmentRepository) Update(ctx context.Context, id int, dto entities.EquipmentUpdateDto) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argId := 1

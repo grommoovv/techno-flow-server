@@ -16,7 +16,7 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.Event.CreateEvent(eventDto)
+	id, err := h.services.Event.CreateEvent(c, eventDto)
 
 	if err != nil {
 		ResponseError(c, "failed to create event", err.Error(), http.StatusInternalServerError)
@@ -28,7 +28,7 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 
 func (h *Handler) GetAllEvents(c *gin.Context) {
 	const op = "event/Handler.GetAllEvents"
-	events, err := h.services.Event.GetAllEvents()
+	events, err := h.services.Event.GetAllEvents(c)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch events", err.Error(), http.StatusInternalServerError)
@@ -48,7 +48,7 @@ func (h *Handler) GetEventById(c *gin.Context) {
 		return
 	}
 
-	event, err := h.services.Event.GetEventById(id)
+	event, err := h.services.Event.GetEventById(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch event", err.Error(), http.StatusInternalServerError)
@@ -68,7 +68,7 @@ func (h *Handler) GetEventsByUserId(c *gin.Context) {
 		return
 	}
 
-	events, err := h.services.Event.GetEventsByUserId(id)
+	events, err := h.services.Event.GetEventsByUserId(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch events", err.Error(), http.StatusInternalServerError)
@@ -88,7 +88,7 @@ func (h *Handler) DeleteEvent(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Event.DeleteEvent(id)
+	err = h.services.Event.DeleteEvent(c, id)
 	if err != nil {
 		ResponseError(c, "failed to delete event", err.Error(), http.StatusInternalServerError)
 		return

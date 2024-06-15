@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -22,7 +23,7 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur *UserRepository) Create(dto entities.UserCreateDto) (int, error) {
+func (ur *UserRepository) Create(ctx context.Context, dto entities.UserCreateDto) (int, error) {
 	const op = "Repository/UserRepository.Create"
 	var userId int
 
@@ -57,7 +58,7 @@ func (ur *UserRepository) Create(dto entities.UserCreateDto) (int, error) {
 	return userId, nil
 }
 
-func (ur *UserRepository) GetAll() ([]entities.User, error) {
+func (ur *UserRepository) GetAll(ctx context.Context) ([]entities.User, error) {
 	const op = "Repository/UserRepository.GetAll"
 	var users []entities.User
 	query := fmt.Sprintf(`
@@ -72,7 +73,7 @@ func (ur *UserRepository) GetAll() ([]entities.User, error) {
 	return users, nil
 }
 
-func (ur *UserRepository) GetById(id int) (entities.User, error) {
+func (ur *UserRepository) GetById(ctx context.Context, id int) (entities.User, error) {
 	const op = "Repository/UserRepository.GetById"
 	var user entities.User
 	query := fmt.Sprintf(`
@@ -85,7 +86,7 @@ func (ur *UserRepository) GetById(id int) (entities.User, error) {
 	return user, err
 }
 
-func (ur *UserRepository) GetByCredentials(userDto entities.UserSignInDto) (entities.User, error) {
+func (ur *UserRepository) GetByCredentials(ctx context.Context, userDto entities.UserSignInDto) (entities.User, error) {
 	const op = "Repository/UserRepository.GetByCredentials"
 	var user entities.User
 	query := fmt.Sprintf(`
@@ -97,7 +98,7 @@ func (ur *UserRepository) GetByCredentials(userDto entities.UserSignInDto) (enti
 	return user, err
 }
 
-func (ur *UserRepository) Delete(id int) (int, error) {
+func (ur *UserRepository) Delete(ctx context.Context, id int) (int, error) {
 	const op = "Repository/UserRepository.Delete"
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.UsersTable)
 	if _, err := ur.db.Exec(query, id); err != nil {
@@ -107,7 +108,7 @@ func (ur *UserRepository) Delete(id int) (int, error) {
 	return id, nil
 }
 
-func (ur *UserRepository) Update(id int, userDto entities.UserUpdateDto) error {
+func (ur *UserRepository) Update(ctx context.Context, id int, userDto entities.UserUpdateDto) error {
 	const op = "Repository/UserRepository.Update"
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)

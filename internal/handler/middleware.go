@@ -50,7 +50,7 @@ func (h *Handler) authMiddleware(c *gin.Context) {
 		return
 	}
 
-	userId, err := h.services.Token.ParseAccessToken(headerParts[1])
+	userId, err := h.services.Token.ParseAccessToken(c, headerParts[1])
 
 	if err != nil {
 		ResponseError(c, "", err.Error(), http.StatusUnauthorized)

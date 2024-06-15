@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"math/rand"
 	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
@@ -16,22 +17,22 @@ func NewMaintenanceService(repo repository.Maintenance, random *rand.Rand) *Main
 	return &MaintenanceService{repo: repo, random: random}
 }
 
-func (ms *MaintenanceService) Create(dto entities.MaintenanceCreateDto) (int, error) {
+func (ms *MaintenanceService) Create(ctx context.Context, dto entities.MaintenanceCreateDto) (int, error) {
 	fixedIn := utils.GenerageRandomDate(ms.random)
 	dto.FixedIn = fixedIn
-	return ms.repo.Create(dto)
+	return ms.repo.Create(ctx, dto)
 }
 
-func (ms *MaintenanceService) GetAll() ([]entities.Maintenance, error) {
-	return ms.repo.GetAll()
+func (ms *MaintenanceService) GetAll(ctx context.Context) ([]entities.Maintenance, error) {
+	return ms.repo.GetAll(ctx)
 }
 
-func (ms *MaintenanceService) GetById(id int) (entities.Maintenance, error) {
-	return ms.repo.GetById(id)
+func (ms *MaintenanceService) GetById(ctx context.Context, id int) (entities.Maintenance, error) {
+	return ms.repo.GetById(ctx, id)
 }
 
-func (ms *MaintenanceService) Delete(id int) error {
-	return ms.repo.Delete(id)
+func (ms *MaintenanceService) Delete(ctx context.Context, id int) error {
+	return ms.repo.Delete(ctx, id)
 }
 
-func (ms *MaintenanceService) Update() {}
+func (ms *MaintenanceService) Update(ctx context.Context) {}

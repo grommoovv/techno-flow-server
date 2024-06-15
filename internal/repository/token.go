@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
@@ -15,7 +16,7 @@ func NewTokenRepository(db *sqlx.DB) *TokenRepository {
 	return &TokenRepository{db: db}
 }
 
-func (tr *TokenRepository) GetByUserId(userId int) (entities.Token, error) {
+func (tr *TokenRepository) GetByUserId(ctx context.Context, userId int) (entities.Token, error) {
 	var token entities.Token
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postgres.TokensTable)
@@ -25,7 +26,7 @@ func (tr *TokenRepository) GetByUserId(userId int) (entities.Token, error) {
 	return token, err
 }
 
-func (tr *TokenRepository) Find(refreshToken string) (entities.Token, error) {
+func (tr *TokenRepository) Find(ctx context.Context, refreshToken string) (entities.Token, error) {
 	var token entities.Token
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE refresh_token = $1", postgres.TokensTable)
@@ -35,7 +36,7 @@ func (tr *TokenRepository) Find(refreshToken string) (entities.Token, error) {
 	return token, err
 }
 
-func (tr *TokenRepository) Save(userId int, refreshToken string) (int, error) {
+func (tr *TokenRepository) Save(ctx context.Context, userId int, refreshToken string) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (refresh_token, user_id) values ($1, $2) RETURNING id", postgres.TokensTable)
@@ -48,14 +49,14 @@ func (tr *TokenRepository) Save(userId int, refreshToken string) (int, error) {
 	return id, nil
 }
 
-func (tr *TokenRepository) Update(userId int, refreshToken string) error {
+func (tr *TokenRepository) Update(ctx context.Context, userId int, refreshToken string) error {
 	query := fmt.Sprintf("UPDATE %s SET refresh_token = $1 WHERE user_id = $2", postgres.TokensTable)
 	_, err := tr.db.Exec(query, refreshToken, userId)
 
 	return err
 }
 
-func (tr *TokenRepository) Delete(refreshToken string) error {
+func (tr *TokenRepository) Delete(ctx context.Context, refreshToken string) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE refresh_token = $1", postgres.TokensTable)
 	if _, err := tr.db.Exec(query, refreshToken); err != nil {
 		return err

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"math/rand"
 	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
@@ -8,70 +9,70 @@ import (
 
 type (
 	Auth interface {
-		SignIn(user entities.UserSignInDto) (entities.User, string, string, error)
-		SignOut(refreshToken string) error
-		Refresh(refreshToken string) (entities.User, string, string, error)
+		SignIn(ctx context.Context, user entities.UserSignInDto) (entities.User, string, string, error)
+		SignOut(ctx context.Context, refreshToken string) error
+		Refresh(ctx context.Context, refreshToken string) (entities.User, string, string, error)
 	}
 
 	User interface {
-		CreateUser(dto entities.UserCreateDto) (int, error)
-		GetUserById(userId int) (entities.User, error)
-		GetUserByCredentials(dto entities.UserSignInDto) (entities.User, error)
-		GetAllUsers() ([]entities.User, error)
-		DeleteUser(id int) (int, error)
-		UpdateUser(id int, dto entities.UserUpdateDto) error
+		CreateUser(ctx context.Context, dto entities.UserCreateDto) (int, error)
+		GetUserById(ctx context.Context, userId int) (entities.User, error)
+		GetUserByCredentials(ctx context.Context, dto entities.UserSignInDto) (entities.User, error)
+		GetAllUsers(ctx context.Context) ([]entities.User, error)
+		DeleteUser(ctx context.Context, id int) (int, error)
+		UpdateUser(ctx context.Context, id int, dto entities.UserUpdateDto) error
 	}
 
 	Equipment interface {
-		GetAllEquipment() ([]entities.Equipment, error)
-		GetAvailableEquipmentByDate(dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error)
-		GetEquipmentById(id int) (entities.Equipment, error)
-		GetEquipmentByEventId(id int) ([]entities.Equipment, error)
-		GetEquipmentUsageHistoryById(id int) ([]entities.EquipmentUsageHistory, error)
+		GetAllEquipment(ctx context.Context) ([]entities.Equipment, error)
+		GetAvailableEquipmentByDate(ctx context.Context, dto entities.GetAvailableEquipmentByDateDto) ([]entities.Equipment, error)
+		GetEquipmentById(ctx context.Context, id int) (entities.Equipment, error)
+		GetEquipmentByEventId(ctx context.Context, id int) ([]entities.Equipment, error)
+		GetEquipmentUsageHistoryById(ctx context.Context, id int) ([]entities.EquipmentUsageHistory, error)
 
-		CreateEquipment(dto entities.EquipmentCreateDto) (int, error)
-		DeleteEquipment(id int) (int, error)
-		UpdateEquipment(id int, dto entities.EquipmentUpdateDto) error
+		CreateEquipment(ctx context.Context, dto entities.EquipmentCreateDto) (int, error)
+		DeleteEquipment(ctx context.Context, id int) (int, error)
+		UpdateEquipment(ctx context.Context, id int, dto entities.EquipmentUpdateDto) error
 	}
 
 	Event interface {
-		CreateEvent(dto entities.EventCreateDto) (int, error)
-		GetAllEvents() ([]entities.Event, error)
-		GetEventById(id int) (entities.Event, error)
-		GetEventsByUserId(id int) ([]entities.Event, error)
-		DeleteEvent(id int) error
-		UpdateEvent()
+		CreateEvent(ctx context.Context, dto entities.EventCreateDto) (int, error)
+		GetAllEvents(ctx context.Context) ([]entities.Event, error)
+		GetEventById(ctx context.Context, id int) (entities.Event, error)
+		GetEventsByUserId(ctx context.Context, id int) ([]entities.Event, error)
+		DeleteEvent(ctx context.Context, id int) error
+		UpdateEvent(ctx context.Context)
 	}
 
 	Report interface {
-		GetAllReports() ([]entities.Report, error)
-		GetReportById(id int) (entities.Report, error)
-		GetReportsByUserId(id int) ([]entities.Report, error)
+		GetAllReports(ctx context.Context) ([]entities.Report, error)
+		GetReportById(ctx context.Context, id int) (entities.Report, error)
+		GetReportsByUserId(ctx context.Context, id int) ([]entities.Report, error)
 
-		CreateReport(dto entities.ReportCreateDto) (int, error)
-		DeleteReport(id int) error
-		UpdateReport()
+		CreateReport(ctx context.Context, dto entities.ReportCreateDto) (int, error)
+		DeleteReport(ctx context.Context, id int) error
+		UpdateReport(ctx context.Context)
 	}
 
 	Maintenance interface {
-		GetAll() ([]entities.Maintenance, error)
-		GetById(id int) (entities.Maintenance, error)
+		GetAll(ctx context.Context) ([]entities.Maintenance, error)
+		GetById(ctx context.Context, id int) (entities.Maintenance, error)
 
-		Create(dto entities.MaintenanceCreateDto) (int, error)
-		Delete(id int) error
-		Update()
+		Create(ctx context.Context, dto entities.MaintenanceCreateDto) (int, error)
+		Delete(ctx context.Context, id int) error
+		Update(ctx context.Context)
 	}
 
 	Token interface {
-		NewRefreshToken(userId int, username string) (string, error)
-		NewAccessToken(userId int, username string) (string, error)
-		ParseRefreshToken(accessToken string) (int, error)
-		ParseAccessToken(accessToken string) (int, error)
-		GetTokenByUserId(userId int) (entities.Token, error)
-		FindRefreshToken(refreshToken string) (entities.Token, error)
-		SaveRefreshToken(userId int, refreshToken string) (int, error)
-		UpdateRefreshToken(userId int, refreshToken string) error
-		DeleteRefreshToken(refreshToken string) error
+		NewRefreshToken(ctx context.Context, userId int, username string) (string, error)
+		NewAccessToken(ctx context.Context, userId int, username string) (string, error)
+		ParseRefreshToken(ctx context.Context, accessToken string) (int, error)
+		ParseAccessToken(ctx context.Context, accessToken string) (int, error)
+		GetTokenByUserId(ctx context.Context, userId int) (entities.Token, error)
+		FindRefreshToken(ctx context.Context, refreshToken string) (entities.Token, error)
+		SaveRefreshToken(ctx context.Context, userId int, refreshToken string) (int, error)
+		UpdateRefreshToken(ctx context.Context, userId int, refreshToken string) error
+		DeleteRefreshToken(ctx context.Context, refreshToken string) error
 	}
 
 	Service struct {

@@ -25,7 +25,7 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	fmt.Println(signInDto)
 
-	user, refreshToken, accessToken, err := h.services.Auth.SignIn(signInDto)
+	user, refreshToken, accessToken, err := h.services.Auth.SignIn(c, signInDto)
 	if err != nil {
 		ResponseError(c, "failed to sign-in", err.Error(), http.StatusInternalServerError)
 		return
@@ -58,7 +58,7 @@ func (h *Handler) signOut(c *gin.Context) {
 		return
 	}
 
-	if err = h.services.Auth.SignOut(refreshToken); err != nil {
+	if err = h.services.Auth.SignOut(c, refreshToken); err != nil {
 		ResponseError(c, "error during Logout", err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -82,7 +82,7 @@ func (h *Handler) refresh(c *gin.Context) {
 		return
 	}
 
-	user, refreshToken, accessToken, err := h.services.Auth.Refresh(token)
+	user, refreshToken, accessToken, err := h.services.Auth.Refresh(c, token)
 	if err != nil {
 		ResponseError(c, "failed to sign-in", err.Error(), http.StatusUnauthorized)
 		return

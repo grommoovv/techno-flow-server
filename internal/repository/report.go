@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"server-techno-flow/internal/database/postgres"
@@ -15,7 +16,7 @@ func NewReportRepository(db *sqlx.DB) *ReportRepository {
 	return &ReportRepository{db: db}
 }
 
-func (rr *ReportRepository) Create(dto entities.ReportCreateDto) (int, error) {
+func (rr *ReportRepository) Create(ctx context.Context, dto entities.ReportCreateDto) (int, error) {
 	var id int
 
 	query := fmt.Sprintf("INSERT INTO %s (message, user_id, equipment_id) values ($1, $2, $3) RETURNING id", postgres.ReportsTable)
@@ -28,7 +29,7 @@ func (rr *ReportRepository) Create(dto entities.ReportCreateDto) (int, error) {
 	return id, nil
 }
 
-func (rr *ReportRepository) GetAll() ([]entities.Report, error) {
+func (rr *ReportRepository) GetAll(ctx context.Context) ([]entities.Report, error) {
 	var reports []entities.Report
 	query := fmt.Sprintf("SELECT * FROM %s ORDER BY id ASC", postgres.ReportsTable)
 	if err := rr.db.Select(&reports, query); err != nil {
@@ -37,7 +38,7 @@ func (rr *ReportRepository) GetAll() ([]entities.Report, error) {
 	return reports, nil
 }
 
-func (rr *ReportRepository) GetById(id int) (entities.Report, error) {
+func (rr *ReportRepository) GetById(ctx context.Context, id int) (entities.Report, error) {
 	var report entities.Report
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", postgres.ReportsTable)
@@ -47,7 +48,7 @@ func (rr *ReportRepository) GetById(id int) (entities.Report, error) {
 	return report, err
 }
 
-func (rr *ReportRepository) GetByUserId(id int) ([]entities.Report, error) {
+func (rr *ReportRepository) GetByUserId(ctx context.Context, id int) ([]entities.Report, error) {
 	var reports []entities.Report
 
 	query := fmt.Sprintf("SELECT * FROM %s WHERE user_id = $1", postgres.ReportsTable)
@@ -59,7 +60,7 @@ func (rr *ReportRepository) GetByUserId(id int) ([]entities.Report, error) {
 	return reports, nil
 }
 
-func (rr *ReportRepository) Delete(id int) error {
+func (rr *ReportRepository) Delete(ctx context.Context, id int) error {
 	query := fmt.Sprintf("DELETE FROM %s WHERE id=$1", postgres.ReportsTable)
 	if _, err := rr.db.Exec(query, id); err != nil {
 		return err
@@ -68,4 +69,4 @@ func (rr *ReportRepository) Delete(id int) error {
 	return nil
 }
 
-func (rr *ReportRepository) Update() {}
+func (rr *ReportRepository) Update(ctx context.Context) {}

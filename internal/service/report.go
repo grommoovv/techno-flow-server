@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"github.com/sirupsen/logrus"
 	"server-techno-flow/internal/entities"
 	"server-techno-flow/internal/repository"
@@ -20,14 +21,14 @@ func NewReportService(repo repository.Report, EquipmentService *EquipmentService
 	}
 }
 
-func (rs *ReportService) CreateReport(dto entities.ReportCreateDto) (int, error) {
+func (rs *ReportService) CreateReport(ctx context.Context, dto entities.ReportCreateDto) (int, error) {
 	var updateEquipmentDto entities.EquipmentUpdateDto
 	status := "На обслуживании"
 	updateEquipmentDto.Status = &status
 
 	equipmentID := dto.EquipmentId
 
-	if err := rs.equipmentService.UpdateEquipment(equipmentID, updateEquipmentDto); err != nil {
+	if err := rs.equipmentService.UpdateEquipment(ctx, equipmentID, updateEquipmentDto); err != nil {
 		logrus.Errorf("error updating equipment status: %v", err.Error())
 		return 0, err
 	}
@@ -35,14 +36,14 @@ func (rs *ReportService) CreateReport(dto entities.ReportCreateDto) (int, error)
 	var createMaintenanceDto entities.MaintenanceCreateDto
 	createMaintenanceDto.EquipmentId = equipmentID
 
-	_, err := rs.maintenanceService.Create(createMaintenanceDto)
+	_, err := rs.maintenanceService.Create(ctx, createMaintenanceDto)
 
 	if err != nil {
 		logrus.Errorf("error creating maintenance: %v", err.Error())
 		return 0, err
 	}
 
-	reportID, err := rs.repo.Create(dto)
+	reportID, err := rs.repo.Create(ctx, dto)
 
 	if err != nil {
 		logrus.Errorf("error creating report: %v", err.Error())
@@ -52,20 +53,20 @@ func (rs *ReportService) CreateReport(dto entities.ReportCreateDto) (int, error)
 	return reportID, nil
 }
 
-func (rs *ReportService) GetAllReports() ([]entities.Report, error) {
-	return rs.repo.GetAll()
+func (rs *ReportService) GetAllReports(ctx context.Context) ([]entities.Report, error) {
+	return rs.repo.GetAll(ctx)
 }
 
-func (rs *ReportService) GetReportById(id int) (entities.Report, error) {
-	return rs.repo.GetById(id)
+func (rs *ReportService) GetReportById(ctx context.Context, id int) (entities.Report, error) {
+	return rs.repo.GetById(ctx, id)
 }
 
-func (rs *ReportService) GetReportsByUserId(id int) ([]entities.Report, error) {
-	return rs.repo.GetByUserId(id)
+func (rs *ReportService) GetReportsByUserId(ctx context.Context, id int) ([]entities.Report, error) {
+	return rs.repo.GetByUserId(ctx, id)
 }
 
-func (rs *ReportService) DeleteReport(id int) error {
-	return rs.repo.Delete(id)
+func (rs *ReportService) DeleteReport(ctx context.Context, id int) error {
+	return rs.repo.Delete(ctx, id)
 }
 
-func (rs *ReportService) UpdateReport() {}
+func (rs *ReportService) UpdateReport(ctx context.Context) {}

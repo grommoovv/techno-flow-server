@@ -10,7 +10,7 @@ func (h *Handler) CreateMaintenance(c *gin.Context) {}
 
 func (h *Handler) GetAllMaintenance(c *gin.Context) {
 	const op = "maintenance/Handler.GetAllMaintenance"
-	maintenance, err := h.services.Maintenance.GetAll()
+	maintenance, err := h.services.Maintenance.GetAll(c)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch maintenance", err.Error(), http.StatusInternalServerError)
@@ -30,7 +30,7 @@ func (h *Handler) GetMaintenanceById(c *gin.Context) {
 		return
 	}
 
-	maintenance, err := h.services.Maintenance.GetById(id)
+	maintenance, err := h.services.Maintenance.GetById(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch maintenance", err.Error(), http.StatusInternalServerError)

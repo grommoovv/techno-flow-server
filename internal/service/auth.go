@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/sha1"
 	"errors"
 	"fmt"
@@ -29,30 +30,30 @@ func NewAuthService(tokenService *TokenService, userService *UserService) *AuthS
 	return &AuthService{tokenService: *tokenService, userService: *userService}
 }
 
-func (as *AuthService) SignIn(credentials entities.UserSignInDto) (entities.User, string, string, error) {
+func (as *AuthService) SignIn(ctx context.Context, credentials entities.UserSignInDto) (entities.User, string, string, error) {
 	credentials.Password = generatePasswordHash(credentials.Password)
-	user, err := as.userService.GetUserByCredentials(credentials)
+	user, err := as.userService.GetUserByCredentials(ctx, credentials)
 
 	if err != nil {
 		fmt.Printf("error getting user by credentials: %s\n", err.Error())
 		return entities.User{}, "", "", err
 	}
 
-	refreshToken, err := as.tokenService.NewRefreshToken(user.Id, user.Username)
+	refreshToken, err := as.tokenService.NewRefreshToken(ctx, user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation refresh token: %s\n", err.Error())
 		return entities.User{}, "", "", err
 	}
 
-	_, err = as.tokenService.SaveRefreshToken(user.Id, refreshToken)
+	_, err = as.tokenService.SaveRefreshToken(ctx, user.Id, refreshToken)
 
 	if err != nil {
 		fmt.Printf("error saving token: %s\n", err.Error())
 		return entities.User{}, "", "", err
 	}
 
-	accessToken, err := as.tokenService.NewAccessToken(user.Id, user.Username)
+	accessToken, err := as.tokenService.NewAccessToken(ctx, user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation access token: %s\n", err.Error())
@@ -62,51 +63,51 @@ func (as *AuthService) SignIn(credentials entities.UserSignInDto) (entities.User
 	return user, refreshToken, accessToken, nil
 }
 
-func (as *AuthService) SignOut(refreshToken string) error {
-	return as.tokenService.DeleteRefreshToken(refreshToken)
+func (as *AuthService) SignOut(ctx context.Context, refreshToken string) error {
+	return as.tokenService.DeleteRefreshToken(ctx, refreshToken)
 }
 
-func (as *AuthService) Refresh(refreshToken string) (entities.User, string, string, error) {
+func (as *AuthService) Refresh(ctx context.Context, refreshToken string) (entities.User, string, string, error) {
 	if refreshToken == "" {
 		return entities.User{}, "", "", errors.New("unauthorized")
 	}
 
-	userId, err := as.tokenService.ParseRefreshToken(refreshToken)
+	userId, err := as.tokenService.ParseRefreshToken(ctx, refreshToken)
 
 	if err != nil {
 		fmt.Printf("error parsing refresh token: %s\n", err.Error())
 		return entities.User{}, "", "", errors.New("unauthorized")
 	}
 
-	_, err = as.tokenService.FindRefreshToken(refreshToken)
+	_, err = as.tokenService.FindRefreshToken(ctx, refreshToken)
 
 	if err != nil {
 		fmt.Printf("error finding token: %s\n", err.Error())
 		return entities.User{}, "", "", errors.New("unauthorized")
 	}
 
-	user, err := as.userService.GetUserById(userId)
+	user, err := as.userService.GetUserById(ctx, userId)
 
 	if err != nil {
 		fmt.Printf("error getting user: %s\n", err.Error())
 		return entities.User{}, "", "", errors.New("unauthorized")
 	}
 
-	newRefreshToken, err := as.tokenService.NewRefreshToken(user.Id, user.Username)
+	newRefreshToken, err := as.tokenService.NewRefreshToken(ctx, user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation refresh token: %s\n", err.Error())
 		return entities.User{}, "", "", err
 	}
 
-	_, err = as.tokenService.SaveRefreshToken(user.Id, newRefreshToken)
+	_, err = as.tokenService.SaveRefreshToken(ctx, user.Id, newRefreshToken)
 
 	if err != nil {
 		fmt.Printf("error saving token: %s\n", err.Error())
 		return entities.User{}, "", "", err
 	}
 
-	newAccessToken, err := as.tokenService.NewAccessToken(user.Id, user.Username)
+	newAccessToken, err := as.tokenService.NewAccessToken(ctx, user.Id, user.Username)
 
 	if err != nil {
 		fmt.Printf("error generation access token: %s\n", err.Error())

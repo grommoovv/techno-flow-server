@@ -16,7 +16,7 @@ func (h *Handler) CreateReport(c *gin.Context) {
 		return
 	}
 
-	id, err := h.services.Report.CreateReport(reportDto)
+	id, err := h.services.Report.CreateReport(c, reportDto)
 
 	if err != nil {
 		ResponseError(c, "failed to create report", err.Error(), http.StatusInternalServerError)
@@ -28,7 +28,7 @@ func (h *Handler) CreateReport(c *gin.Context) {
 
 func (h *Handler) GetAllReports(c *gin.Context) {
 	const op = "report/Handler.GetAllReports"
-	reports, err := h.services.Report.GetAllReports()
+	reports, err := h.services.Report.GetAllReports(c)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch reports", err.Error(), http.StatusInternalServerError)
@@ -48,7 +48,7 @@ func (h *Handler) GetReportById(c *gin.Context) {
 		return
 	}
 
-	report, err := h.services.Report.GetReportById(id)
+	report, err := h.services.Report.GetReportById(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch report", err.Error(), http.StatusInternalServerError)
@@ -68,7 +68,7 @@ func (h *Handler) GetReportsByUserId(c *gin.Context) {
 		return
 	}
 
-	reports, err := h.services.Report.GetReportsByUserId(id)
+	reports, err := h.services.Report.GetReportsByUserId(c, id)
 
 	if err != nil {
 		ResponseError(c, "failed to fetch reports", err.Error(), http.StatusInternalServerError)
@@ -88,7 +88,7 @@ func (h *Handler) DeleteReport(c *gin.Context) {
 		return
 	}
 
-	err = h.services.Report.DeleteReport(id)
+	err = h.services.Report.DeleteReport(c, id)
 	if err != nil {
 		ResponseError(c, "failed to delete report", err.Error(), http.StatusInternalServerError)
 		return
