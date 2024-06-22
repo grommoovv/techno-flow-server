@@ -12,10 +12,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type UserRepository struct {
-	db *sqlx.DB
-}
-
 var (
 	ErrUserExist        = errors.New("user already exists")
 	ErrUserNotFound     = errors.New("user not found")
@@ -25,6 +21,10 @@ var (
 	ErrUpdateUser       = errors.New("failed to update user")
 	ErrBeginTransaction = errors.New("failed to begin transaction")
 )
+
+type UserRepository struct {
+	db *sqlx.DB
+}
 
 func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
