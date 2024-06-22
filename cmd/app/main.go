@@ -1,7 +1,7 @@
 package main
 
 import (
-	"server-techno-flow/app"
+	"server-techno-flow/internal/app"
 )
 
 func main() {
